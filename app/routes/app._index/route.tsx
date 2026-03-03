@@ -2,8 +2,13 @@ import {useTranslation} from 'react-i18next';
 import {TablePagination} from '~/components';
 
 import type {LoaderFunctionArgs} from '@remix-run/node';
-import {useLoaderData, type ShouldRevalidateFunction} from '@remix-run/react';
 import {
+  useLoaderData,
+  useNavigate,
+  type ShouldRevalidateFunction,
+} from '@remix-run/react';
+import {
+  Button,
   Box,
   Card,
   Divider,
@@ -12,6 +17,7 @@ import {
   Text,
   useIndexResourceState,
 } from '@shopify/polaris';
+import {PlusCircleIcon} from '@shopify/polaris-icons';
 
 import type {PaginationInfo} from '~/types';
 import type {SubscriptionContractListItem} from '~/types/contracts';
@@ -78,6 +84,7 @@ export const shouldRevalidate: ShouldRevalidateFunction = ({
 
 export default function Index() {
   const {t, i18n} = useTranslation('app.contracts');
+  const navigate = useNavigate();
   const loaderData = useLoaderData<typeof loader>();
   const {
     subscriptionContracts,
@@ -104,7 +111,23 @@ export default function Index() {
   } = useIndexResourceState(formattedContracts);
 
   return (
-    <Page title={t('page.title')}>
+    <Page
+      title={t('page.title')}
+      primaryAction={
+        <Button
+          variant="primary"
+          onClick={() => navigate('/app/plans/create')}
+          icon={PlusCircleIcon}
+          accessibilityLabel={t('page.addSubscriptionManually', {
+            defaultValue: 'Add subscription manually',
+          })}
+        >
+          {t('page.addSubscriptionManually', {
+            defaultValue: 'Add subscription manually',
+          })}
+        </Button>
+      }
+    >
       <Box paddingBlockEnd="400" width="100%">
         {subscriptionContracts?.length === 0 && !savedView ? (
           <Card>
