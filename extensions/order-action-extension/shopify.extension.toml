@@ -1,0 +1,14 @@
+api_version = "2025-10"
+
+[[extensions]]
+uid = "616cac44-d0a2-71df-af0c-ca1793419c703adcbc06"
+type = "ui_extension"
+name = "Manage subscription button"
+handle = "buyer-subscriptions-oa"
+
+[[extensions.targeting]]
+module = "./src/OrderActionMenuItem.tsx"
+target = "customer-account.order.action.menu-item.render"
+
+[extensions.capabilities]
+api_access = true

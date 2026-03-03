@@ -1,0 +1,20 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+client_id = "95dce778ddd22f56d62108b5e070187c"
+name = "Subscriptions application"
+application_url = "https://example.com"
+embedded = true
+
+[build]
+automatically_update_urls_on_dev = true
+include_config_on_deploy = true
+
+[webhooks]
+api_version = "2026-04"
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = "customer_read_customers,customer_read_orders,customer_read_own_subscription_contracts,customer_write_customers,customer_write_own_subscription_contracts,read_all_orders,read_analytics,read_locales,read_locations,read_themes,write_customers,write_metaobject_definitions,write_metaobjects,write_orders,write_own_subscription_contracts,write_products,write_translations"
+
+[auth]
+redirect_urls = [ "https://example.com/api/auth" ]
