@@ -116,7 +116,7 @@ export default function Index() {
       primaryAction={
         <Button
           variant="primary"
-          onClick={() => navigate('/app/plans/create')}
+          onClick={() => navigate('/app/contracts/create')}
           icon={PlusCircleIcon}
           accessibilityLabel={t('page.addSubscriptionManually', {
             defaultValue: 'Add subscription manually',

@@ -7,7 +7,9 @@ import {
   Scripts,
   ScrollRestoration,
   useLoaderData,
+  useNavigate,
 } from '@remix-run/react';
+import {useEffect} from 'react';
 import {useTranslation} from 'react-i18next';
 
 import remixI18n from './i18n/i18next.server';
@@ -32,6 +34,33 @@ export async function loader({request}: LoaderFunctionArgs) {
 export default function App() {
   const {locale, ENV} = useLoaderData<typeof loader>();
   const {i18n} = useTranslation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleNavigate = (event: Event) => {
+      const detailUrl = (event as CustomEvent<{url?: string}>).detail?.url;
+      if (typeof detailUrl === 'string' && detailUrl.length > 0) {
+        navigate(detailUrl);
+        return;
+      }
+
+      const target = event.target;
+      if (!(target instanceof Element)) {
+        return;
+      }
+
+      const href = target.getAttribute('href');
+      if (href) {
+        navigate(href);
+      }
+    };
+
+    document.addEventListener('shopify:navigate', handleNavigate);
+    return () => {
+      document.removeEventListener('shopify:navigate', handleNavigate);
+    };
+  }, [navigate]);
+
   return (
     <html lang={locale} dir={i18n.dir()}>
       <head>
@@ -43,6 +72,7 @@ export default function App() {
           href="https://cdn.shopify.com/static/fonts/inter/v4/styles.css"
         />
         <meta name="shopify-experimental-features" content="keepAlive" />
+        <script src="https://cdn.shopify.com/shopifycloud/polaris.js"></script>
         <Meta />
         <Links />
       </head>

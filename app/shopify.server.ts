@@ -20,7 +20,11 @@ const shopify = shopifyApp({
   apiSecretKey: process.env.SHOPIFY_API_SECRET || '',
   apiVersion: ApiVersion.Unstable,
   scopes: process.env.SCOPES?.split(','),
-  appUrl: process.env.SHOPIFY_APP_URL || '',
+  appUrl:
+    process.env.SHOPIFY_APP_URL ||
+    process.env.APP_URL ||
+    process.env.HOST ||
+    '',
   authPathPrefix: '/auth',
   sessionStorage:
     config.shopify.sessionStorage === SessionStorageConfig.Memory
