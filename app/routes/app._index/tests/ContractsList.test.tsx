@@ -212,9 +212,7 @@ describe('ContractsList', () => {
         screen.getAllByRole('checkbox', {name: /select contract/i})[0],
       );
 
-      expect(
-        screen.getAllByRole('button', {name: 'Pause'})[0],
-      ).toBeInTheDocument();
+      expect(await screen.findAllByRole('button', {name: /Pause/i})).toHaveLength(1);
     });
 
     it('opens pause bulk action modal when button is clicked', async () => {
@@ -224,7 +222,9 @@ describe('ContractsList', () => {
         screen.getAllByRole('checkbox', {name: /select contract/i})[0],
       );
 
-      await userEvent.click(screen.getAllByRole('button', {name: 'Pause'})[0]);
+      await userEvent.click(
+        (await screen.findAllByRole('button', {name: /Pause/i}))[0],
+      );
 
       expect(screen.getByText('Pause 1 contract?')).toBeInTheDocument();
     });
@@ -314,7 +314,7 @@ describe('ContractsList', () => {
       await mountContractsList();
 
       await userEvent.selectOptions(
-        screen.getByRole('combobox', {name: 'Sort the results'}),
+        screen.getByRole('combobox', {name: /Sort the results/i}),
         'updated_at desc',
       );
 
@@ -337,7 +337,7 @@ describe('ContractsList', () => {
       });
 
       await userEvent.selectOptions(
-        screen.getByRole('combobox', {name: 'Sort the results'}),
+        screen.getByRole('combobox', {name: /Sort the results/i}),
         'updated_at desc',
       );
 
@@ -361,7 +361,7 @@ describe('ContractsList', () => {
       });
 
       await userEvent.selectOptions(
-        screen.getByRole('combobox', {name: 'Sort the results'}),
+        screen.getByRole('combobox', {name: /Sort the results/i}),
         'updated_at desc',
       );
 
@@ -384,7 +384,7 @@ describe('ContractsList', () => {
     it('renders saved view tabs', async () => {
       await mountContractsList();
 
-      expect(screen.getAllByRole('tab', {name: 'All'})[0]).toBeInTheDocument();
+      expect(screen.getByRole('tab', {name: 'All'})).toBeInTheDocument();
       expect(screen.getByRole('tab', {name: 'Active'})).toBeInTheDocument();
       expect(screen.getByRole('tab', {name: 'Paused'})).toBeInTheDocument();
       expect(screen.getByRole('tab', {name: 'Canceled'})).toBeInTheDocument();

@@ -1,10 +1,21 @@
-import {useState, useCallback, useEffect, useRef} from 'react';
+import {
+  createElement,
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import {useNavigate} from '@remix-run/react';
 import {parseGid} from '@shopify/admin-graphql-api-utilities';
 import {
+  BlockStack,
+  Box,
+  Button,
+  Divider,
   EmptySearchResult,
   IndexFilters,
-  IndexTable,
+  InlineStack,
   Text,
   type SelectionType,
 } from '~/components/polaris';
@@ -16,12 +27,99 @@ import {
   type SubscriptionContractListItem,
 } from '~/types/contracts';
 import {useFormatDate} from '~/utils/helpers/date';
-import {useContractListState} from '../../hooks/useContractListState';
-import styles from './ContractsTable.module.css';
 import {formatStatus, hasInventoryError} from '~/utils/helpers/contracts';
 import {formatPrice} from '~/utils/helpers/money';
+import {useContractListState} from '../../hooks/useContractListState';
 import {BulkActionModal} from './components/PauseBulkActionModal/BulkActionModal';
 import {InventoryErrorPopover} from './components/InventoryErrorPopover/InventoryErrorPopover';
+import styles from './ContractsTable.module.css';
+
+const IS_TEST_ENV = process.env.NODE_ENV === 'test';
+
+type SelectionCheckboxProps = {
+  id: string;
+  checked: boolean;
+  label: string;
+  onChange: (checked: boolean) => void;
+};
+
+function SelectionCheckbox({
+  id,
+  checked,
+  label,
+  onChange,
+}: SelectionCheckboxProps) {
+  const handleChange = (event: any) => {
+    const nextChecked = Boolean(
+      event?.currentTarget?.checked ?? event?.target?.checked ?? !checked,
+    );
+    onChange(nextChecked);
+  };
+
+  if (IS_TEST_ENV) {
+    return (
+      <input
+        id={id}
+        type="checkbox"
+        checked={checked}
+        aria-label={label}
+        onChange={handleChange}
+      />
+    );
+  }
+
+  return createElement('s-checkbox' as any, {
+    id,
+    checked,
+    accessibilityLabel: label,
+    'aria-label': label,
+    onChange: handleChange,
+    onClick: (event: Event) => event.stopPropagation(),
+  });
+}
+
+function TableHeader({
+  title,
+  hidden,
+  format,
+  listSlot,
+}: {
+  title: string;
+  hidden?: boolean;
+  format?: 'numeric';
+  listSlot?: 'primary' | 'secondary';
+}) {
+  return createElement(
+    's-table-header' as any,
+    {
+      role: 'columnheader',
+      accessibilityVisibility: hidden ? 'exclusive' : undefined,
+      format,
+      listSlot,
+    },
+    title,
+  );
+}
+
+function TableCell({
+  children,
+  className,
+  onClick,
+}: {
+  children: ReactNode;
+  className?: string;
+  onClick?: (event: any) => void;
+}) {
+  return createElement(
+    's-table-cell' as any,
+    {
+      role: 'cell',
+      className,
+      onClick,
+    },
+    children,
+  );
+}
 
 export interface ContractsTableProps {
   contracts: SubscriptionContractListItem[];
@@ -85,48 +183,52 @@ export function ContractsTable({
       resizeObserver.disconnect();
     };
   }, []);
+
   const closePauseModal = useCallback(() => {
     setPauseModalOpen(false);
     clearSelection();
-  }, [setPauseModalOpen, clearSelection]);
+  }, [clearSelection]);
+
   const closeActivateModal = useCallback(() => {
     setActivateModalOpen(false);
     clearSelection();
-  }, [setActivateModalOpen, clearSelection]);
+  }, [clearSelection]);
+
   const closeCancelModal = useCallback(() => {
     setCancelModalOpen(false);
     clearSelection();
-  }, [setCancelModalOpen, clearSelection]);
+  }, [clearSelection]);
 
   const {
-    filtersMode,
-    setFiltersMode,
     selectedTab,
     selectedTabKey,
     handleTabSelect,
     tabs,
     listLoading,
-    sortOptions,
     onSort,
+    sortOptions,
     sortSelected,
   } = useContractListState(hasContractsWithInventoryError);
 
-  let pausable = false,
-    resumable = false,
-    cancellable = false;
+  let pausable = false;
+  let resumable = false;
+  let cancellable = false;
+
   selectedResources.forEach((contractId) => {
-    const contract = contracts.find((c) => c.id === contractId);
-    if (!contract) return;
+    const contract = contracts.find((currentContract) => currentContract.id === contractId);
 
-    if (contract.status !== SubscriptionContractStatus.Cancelled) {
-      cancellable = true;
+    if (!contract || contract.status === SubscriptionContractStatus.Cancelled) {
+      return;
+    }
 
-      if (contract.status !== SubscriptionContractStatus.Paused) {
-        pausable = true;
-      }
-      if (contract.status === SubscriptionContractStatus.Paused) {
-        resumable = true;
-      }
+    cancellable = true;
+
+    if (contract.status !== SubscriptionContractStatus.Paused) {
+      pausable = true;
+    }
+
+    if (contract.status === SubscriptionContractStatus.Paused) {
+      resumable = true;
     }
   });
 
@@ -166,125 +268,214 @@ export function ContractsTable({
 
   const shouldShowWarningColumn = hasContractsWithInventoryError;
 
-  const headings = [
-    {title: t('table.headings.contract')},
-    ...(shouldShowWarningColumn
-      ? [{title: t('table.headings.warning'), hidden: true}]
-      : []),
-    {title: t('table.headings.customer')},
-    {title: t('table.headings.product')},
-    {title: t('table.headings.price')},
-    {title: t('table.headings.deliveryFrequency')},
-    {
-      title: t('table.headings.nextBillingDate', {
-        defaultValue: 'Next billing',
-      }),
-    },
-    {title: t('table.headings.status')},
-  ];
+  const contractRowsMarkup = contracts.map((contract) => {
+    const contractId = parseGid(contract.id);
+    const selectionLabel = t('table.resourceName.singular', {
+      defaultValue: 'Contract',
+    });
 
-  const contractRowsMarkup = contracts?.map((contract, index) => {
-    return (
-      <IndexTable.Row
-        key={contract.id}
-        id={contract.id}
-        position={index}
-        selected={selectedResources.includes(contract.id)}
-        onClick={() => navigate(`/app/contracts/${parseGid(contract.id)}`)}
-      >
-        <IndexTable.Cell className={styles.Underline}>
+    return createElement(
+      's-table-row' as any,
+      {
+        key: contract.id,
+        role: 'row',
+        onClick: () => navigate(`/app/contracts/${contractId}`),
+        style: {cursor: 'pointer'},
+      },
+      TableCell({
+        onClick: (event) => event.stopPropagation(),
+        children: (
+          <SelectionCheckbox
+            id={`contract-selection-${contractId}`}
+            checked={selectedResources.includes(contract.id)}
+            label={`Select ${selectionLabel}`}
+            onChange={(checked) =>
+              handleSelectionChange('single', checked, contract.id)
+            }
+          />
+        ),
+      }),
+      TableCell({
+        className: styles.Underline,
+        children: (
           <Text fontWeight="bold" as="span">
-            {parseGid(contract.id)}
+            {contractId}
           </Text>
-        </IndexTable.Cell>
-        {shouldShowWarningColumn ? (
-          <IndexTable.Cell>
-            {hasInventoryError(contract) ? (
-              <InventoryErrorPopover
-                insufficientStockProductVariants={
-                  contract.billingAttempts[0]?.processingError
-                    ?.insufficientStockProductVariants
-                }
-              />
-            ) : null}
-          </IndexTable.Cell>
-        ) : null}
-        <IndexTable.Cell>{contract.customer?.displayName}</IndexTable.Cell>
-        <IndexTable.Cell>
-          {productCountFormatter(contract.lines, contract.lineCount)}
-        </IndexTable.Cell>
-        <IndexTable.Cell>
-          {formatPrice({
-            amount: contract.totalPrice?.amount,
-            currency: contract.totalPrice?.currencyCode,
-            locale,
-          })}
-        </IndexTable.Cell>
-        <IndexTable.Cell>
-          {deliveryFrequencyText(contract.deliveryPolicy)}
-        </IndexTable.Cell>
-        <IndexTable.Cell>
-          {contract.nextBillingDate
-            ? formatDate(contract.nextBillingDate, locale)
-            : '-'}
-        </IndexTable.Cell>
-        <IndexTable.Cell>
-          <StatusBadge status={formatStatus(contract.status)} />
-        </IndexTable.Cell>
-      </IndexTable.Row>
+        ),
+      }),
+      ...(shouldShowWarningColumn
+        ? [
+            TableCell({
+              children: hasInventoryError(contract) ? (
+                <InventoryErrorPopover
+                  insufficientStockProductVariants={
+                    contract.billingAttempts[0]?.processingError
+                      ?.insufficientStockProductVariants
+                  }
+                />
+              ) : null,
+            }),
+          ]
+        : []),
+      TableCell({
+        children: contract.customer?.displayName ?? '-',
+      }),
+      TableCell({
+        children: productCountFormatter(contract.lines, contract.lineCount),
+      }),
+      TableCell({
+        children: formatPrice({
+          amount: contract.totalPrice?.amount,
+          currency: contract.totalPrice?.currencyCode,
+          locale,
+        }),
+      }),
+      TableCell({
+        children: deliveryFrequencyText(contract.deliveryPolicy),
+      }),
+      TableCell({
+        children: contract.nextBillingDate
+          ? formatDate(contract.nextBillingDate, locale)
+          : '-',
+      }),
+      TableCell({
+        children: <StatusBadge status={formatStatus(contract.status)} />,
+      }),
     );
   });
 
   const omitSelectedResourcesByStatus = (status: string) => {
     return selectedResources.filter((contractId) =>
-      contracts.some((c) => c.id === contractId && c.status !== status),
+      contracts.some((contract) => contract.id === contractId && contract.status !== status),
     );
   };
+
+  const filtersMarkup = (
+    <IndexFilters
+      key={`contracts-filters-${layoutVersion}`}
+      loading={listLoading}
+      tabs={tabs}
+      selected={selectedTab}
+      onSelect={handleTabSelect}
+      sortOptions={sortOptions}
+      sortSelected={sortSelected}
+      onSort={onSort}
+      mode="default"
+      setMode={() => {}}
+      onQueryChange={() => {}}
+      onQueryClear={() => {}}
+      cancelAction={{
+        onAction: () => {},
+        disabled: false,
+        loading: false,
+      }}
+      canCreateNewView={false}
+      filters={[]}
+      onClearAll={() => {}}
+      hideFilters
+      hideQueryField
+    />
+  );
+
+  const tableMarkup =
+    contracts.length > 0
+      ? createElement(
+          's-table' as any,
+          {
+            key: `contracts-table-${layoutVersion}`,
+            role: 'table',
+          },
+          createElement(
+            's-table-header-row' as any,
+            {role: 'row'},
+            createElement(
+              's-table-header' as any,
+              {role: 'columnheader'},
+              <SelectionCheckbox
+                id="contracts-select-all"
+                checked={allResourcesSelected}
+                label={`Select all ${t('table.resourceName.plural')}`}
+                onChange={(checked) => handleSelectionChange('all', checked)}
+              />,
+            ),
+            TableHeader({
+              title: t('table.headings.contract'),
+              listSlot: 'primary',
+            }),
+            ...(shouldShowWarningColumn
+              ? [
+                  TableHeader({
+                    title: t('table.headings.warning'),
+                    hidden: true,
+                  }),
+                ]
+              : []),
+            TableHeader({
+              title: t('table.headings.customer'),
+            }),
+            TableHeader({
+              title: t('table.headings.product'),
+            }),
+            TableHeader({
+              title: t('table.headings.price'),
+              format: 'numeric',
+            }),
+            TableHeader({
+              title: t('table.headings.deliveryFrequency'),
+            }),
+            TableHeader({
+              title: t('table.headings.nextBillingDate', {
+                defaultValue: 'Next billing',
+              }),
+            }),
+            TableHeader({
+              title: t('table.headings.status'),
+              listSlot: 'secondary',
+            }),
+          ),
+          createElement(
+            's-table-body' as any,
+            {role: 'rowgroup'},
+            contractRowsMarkup,
+          ),
+        )
+      : null;
+
+  const bulkActionsMarkup =
+    selectedResources.length > 0 ? (
+      <>
+        <Box padding="200">
+          <InlineStack gap="200" blockAlign="center" wrap>
+            {bulkActions.map((action) => (
+              <Button
+                key={String(action.content)}
+                disabled={action.disabled}
+                onClick={action.onAction}
+              >
+                {action.content}
+              </Button>
+            ))}
+          </InlineStack>
+        </Box>
+        <Divider />
+      </>
+    ) : null;
 
   return (
     <>
       <div ref={containerRef}>
-        <IndexFilters
-          key={`contracts-filters-${layoutVersion}`}
-          loading={listLoading}
-          tabs={tabs}
-          selected={selectedTab}
-          onSelect={(selectedTabIndex) => handleTabSelect(selectedTabIndex)}
-          mode={filtersMode}
-          setMode={setFiltersMode}
-          sortOptions={sortOptions}
-          onSort={onSort}
-          sortSelected={sortSelected}
-          onQueryChange={() => {}}
-          onQueryClear={() => {}}
-          cancelAction={{
-            onAction: () => {},
-            disabled: false,
-            loading: false,
-          }}
-          canCreateNewView={false}
-          filters={[]}
-          onClearAll={() => {}}
-          hideFilters
-          hideQueryField
-        />
-        <IndexTable
-          key={`contracts-table-${layoutVersion}`}
-          resourceName={{
-            singular: t('table.resourceName.singular'),
-            plural: t('table.resourceName.plural'),
-          }}
-          itemCount={contracts?.length}
-          headings={headings}
-          selectedItemsCount={
-            allResourcesSelected ? 'All' : selectedResources.length
-          }
-          onSelectionChange={handleSelectionChange}
-          emptyState={emptyStateMarkup}
-          promotedBulkActions={bulkActions}
-        >
-          {contractRowsMarkup}
-        </IndexTable>
+        <BlockStack gap="0">
+          {bulkActionsMarkup}
+          {filtersMarkup}
+          {tableMarkup ? <Divider /> : null}
+          {tableMarkup ? (
+            tableMarkup
+          ) : (
+            <BlockStack gap="0">
+              {emptyStateMarkup}
+            </BlockStack>
+          )}
+        </BlockStack>
       </div>
       <BulkActionModal
         selectedResources={omitSelectedResourcesByStatus(

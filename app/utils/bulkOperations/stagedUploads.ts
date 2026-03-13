@@ -1,5 +1,4 @@
 import {NodeOnDiskFile} from '@remix-run/node';
-import {Method} from '@shopify/network';
 import type {GraphQLClient} from '~/types';
 
 import type {
@@ -70,7 +69,7 @@ const uploadFile = async (
 
   try {
     const response = await fetch(stagedUploadTarget.url, {
-      method: Method.Post,
+      method: 'POST',
       body: formData,
       signal: abortController?.signal,
     });

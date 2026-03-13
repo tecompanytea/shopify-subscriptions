@@ -96,7 +96,7 @@ export default async function handleRequest(
             style-src 'self' 'unsafe-inline' https://cdn.shopify.com; \
             font-src 'self' https://cdn.shopify.com; \
             img-src 'self' data: https://cdn.shopify.com; \
-            connect-src 'self' https://atlas.shopifysvc.com https://extensions.shopifycdn.com; \
+            connect-src 'self' https://atlas.shopifysvc.com https://extensions.shopifycdn.com https://cdn.shopify.com; \
             upgrade-insecure-requests",
           );
           responseHeaders.set(
