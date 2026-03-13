@@ -3,8 +3,8 @@ import {Link, Outlet, useLoaderData, useRouteError} from '@remix-run/react';
 import {parseGid} from '@shopify/admin-graphql-api-utilities';
 import {NavMenu} from '@shopify/app-bridge-react';
 import {boundary} from '@shopify/shopify-app-react-router/server';
-import {AppProvider} from '@shopify/shopify-app-react-router/react';
 import {useTranslation} from 'react-i18next';
+import {ShopifyAppProvider} from '~/components/ShopifyAppProvider';
 import ShopContext from '~/context/ShopContext';
 import {ErrorBoundaryCard} from '~/components/ErrorBoundaryCard';
 
@@ -70,7 +70,7 @@ export default function App() {
 
   return (
     <>
-      <AppProvider embedded apiKey={apiKey}>
+      <ShopifyAppProvider embedded apiKey={apiKey}>
         <ShopContext.Provider value={shopInfo}>
           <NavMenu>
             <Link to="/app" rel="home">
@@ -82,7 +82,7 @@ export default function App() {
           </NavMenu>
           <Outlet />
         </ShopContext.Provider>
-      </AppProvider>
+      </ShopifyAppProvider>
     </>
   );
 }
@@ -110,9 +110,9 @@ export function ErrorBoundary() {
     }
 
     return (
-      <AppProvider embedded apiKey={getApiKey()}>
+      <ShopifyAppProvider embedded apiKey={getApiKey()}>
         <ErrorBoundaryCard />
-      </AppProvider>
+      </ShopifyAppProvider>
     );
   }
 }

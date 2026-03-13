@@ -3,7 +3,7 @@ import {
   mountRemixStubWithAppContext,
   waitForGraphQL,
 } from '#/test-utils';
-import {screen, waitFor} from '@testing-library/react';
+import {screen} from '@testing-library/react';
 import {beforeEach, describe, expect, it} from 'vitest';
 
 import userEvent from '@testing-library/user-event';
@@ -313,13 +313,10 @@ describe('ContractsList', () => {
     it('loads new sort order when changing order in the UI', async () => {
       await mountContractsList();
 
-      await userEvent.click(screen.getByLabelText('Sort the results'));
-
-      await waitFor(() => {
-        expect(screen.getByLabelText('Updated')).toBeInTheDocument();
-      });
-
-      await userEvent.click(screen.getByLabelText('Updated'));
+      await userEvent.selectOptions(
+        screen.getByRole('combobox', {name: 'Sort the results'}),
+        'updated_at desc',
+      );
 
       await waitForGraphQL();
 
@@ -339,13 +336,10 @@ describe('ContractsList', () => {
         initialPath: '/app/contracts?savedView=active',
       });
 
-      await userEvent.click(screen.getByLabelText('Sort the results'));
-
-      await waitFor(() => {
-        expect(screen.getByLabelText('Updated')).toBeInTheDocument();
-      });
-
-      await userEvent.click(screen.getByLabelText('Updated'));
+      await userEvent.selectOptions(
+        screen.getByRole('combobox', {name: 'Sort the results'}),
+        'updated_at desc',
+      );
 
       await waitForGraphQL();
 
@@ -366,13 +360,10 @@ describe('ContractsList', () => {
         initialPath: '/app/contracts?after=123',
       });
 
-      await userEvent.click(screen.getByLabelText('Sort the results'));
-
-      await waitFor(() => {
-        expect(screen.getByLabelText('Updated')).toBeInTheDocument();
-      });
-
-      await userEvent.click(screen.getByLabelText('Updated'));
+      await userEvent.selectOptions(
+        screen.getByRole('combobox', {name: 'Sort the results'}),
+        'updated_at desc',
+      );
 
       await waitForGraphQL();
 

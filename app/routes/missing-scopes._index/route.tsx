@@ -1,8 +1,8 @@
 import {useTranslation} from 'react-i18next';
 import {json, type LoaderFunctionArgs} from '@remix-run/node';
 import {Link, useLoaderData} from '@remix-run/react';
-import {AppProvider} from '@shopify/shopify-app-react-router/react';
 import {BlockStack, Card, Layout, List, Page, Text} from '~/components/polaris';
+import {ShopifyAppProvider} from '~/components/ShopifyAppProvider';
 
 import {authenticate} from '~/shopify.server';
 import {missingApprovedScopes} from '~/utils/missingApprovedScopes';
@@ -19,7 +19,7 @@ export default function MissingScopes() {
   const {scopes} = useLoaderData<typeof loader>();
 
   return (
-    <AppProvider embedded={false}>
+    <ShopifyAppProvider embedded={false}>
       <Page narrowWidth>
         <Layout>
           <Layout.Section>
@@ -56,6 +56,6 @@ export default function MissingScopes() {
           </Layout.Section>
         </Layout>
       </Page>
-    </AppProvider>
+    </ShopifyAppProvider>
   );
 }

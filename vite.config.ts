@@ -84,7 +84,7 @@ export default defineConfig({
     include: [
       '@shopify/admin-graphql-api-utilities',
       '@shopify/app-bridge-react',
-      '@shopify/shopify-app-remix/react',
+      '@shopify/shopify-app-react-router/react',
       '@shopify/polaris-icons',
       '@shopify/address',
       '@rvf/remix',

@@ -10,7 +10,7 @@ import {
 import {useState} from 'react';
 
 import {Form, useActionData, useLoaderData} from '@remix-run/react';
-import {AppProvider} from '@shopify/shopify-app-react-router/react';
+import {ShopifyAppProvider} from '~/components/ShopifyAppProvider';
 
 import {login} from '../../shopify.server';
 import {loginErrorMessage} from './error.server';
@@ -38,7 +38,7 @@ export default function Auth() {
   const {errors} = actionData || loaderData;
 
   return (
-    <AppProvider embedded={false}>
+    <ShopifyAppProvider embedded={false}>
       <Page>
         <Card>
           <Form method="post">
@@ -61,6 +61,6 @@ export default function Auth() {
           </Form>
         </Card>
       </Page>
-    </AppProvider>
+    </ShopifyAppProvider>
   );
 }

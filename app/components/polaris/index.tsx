@@ -29,6 +29,8 @@ export type MenuActionDescriptor = {
   onAction?: () => void;
   disabled?: boolean;
   destructive?: boolean;
+  helpText?: React.ReactNode;
+  icon?: any;
 };
 
 export type IndexFiltersProps = {
@@ -255,9 +257,59 @@ export function Button({
   );
 }
 
-export function Link({children, url, removeUnderline: _removeUnderline, ...rest}: any) {
+function renderActionNode(
+  action: any,
+  key?: React.Key,
+  defaultVariant: string = 'secondary',
+) {
+  if (!action) return null;
+  if (isValidElement(action)) return key !== undefined ? cloneElement(action as any, {key}) : action;
+
   return (
-    <s-link {...rest} role="link" href={url}>
+    <Button
+      key={key}
+      variant={action.variant ?? defaultVariant}
+      tone={action.destructive ? 'critical' : action.tone}
+      disabled={action.disabled}
+      loading={action.loading}
+      icon={action.icon}
+      accessibilityLabel={action.accessibilityLabel}
+      onClick={action.onAction}
+    >
+      {action.content || action.children}
+    </Button>
+  );
+}
+
+export function Link({
+  children,
+  url,
+  onClick,
+  accessibilityLabel,
+  removeUnderline: _removeUnderline,
+  ...rest
+}: any) {
+  if (!url && onClick) {
+    return (
+      <Button
+        {...rest}
+        variant="tertiary"
+        accessibilityLabel={accessibilityLabel}
+        onClick={onClick}
+      >
+        {children}
+      </Button>
+    );
+  }
+
+  return (
+    <s-link
+      {...rest}
+      role="link"
+      href={url}
+      accessibilityLabel={accessibilityLabel}
+      aria-label={accessibilityLabel}
+    >
       {children}
     </s-link>
   );
@@ -274,7 +326,14 @@ export function Badge({children, tone, ...rest}: any) {
 export function Banner({children, tone, title, ...rest}: any) {
   return (
     <s-banner {...rest} heading={title} tone={mapTone(tone)}>
-      {children}
+      <BlockStack gap="200">
+        {title ? (
+          <Text as="h3" variant="headingMd">
+            {title}
+          </Text>
+        ) : null}
+        {children}
+      </BlockStack>
     </s-banner>
   );
 }
@@ -479,6 +538,77 @@ export function Card({children, padding, title, ...rest}: any) {
   );
 }
 
+function ModalSection({children}: any) {
+  return <s-box padding="base">{children}</s-box>;
+}
+
+export function Modal({
+  open,
+  onClose,
+  title,
+  primaryAction,
+  secondaryActions,
+  footer,
+  children,
+}: any) {
+  if (!open) return null;
+
+  const primaryActionNode = renderActionNode(primaryAction, undefined, 'primary');
+  const secondaryActionNodes = Array.isArray(secondaryActions)
+    ? secondaryActions.map((action, index) => renderActionNode(action, index))
+    : renderActionNode(secondaryActions);
+
+  return (
+    <div
+      role="presentation"
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 2147483647,
+        background: 'rgba(0, 0, 0, 0.4)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '1rem',
+      }}
+      onClick={(event) => {
+        if (event.target === event.currentTarget) {
+          onClose?.();
+        }
+      }}
+    >
+      <s-section padding="none">
+        <BlockStack gap="0">
+          <s-box padding="base">
+            <InlineStack align="space-between" blockAlign="center">
+              <Text as="h2" variant="headingMd">
+                {title}
+              </Text>
+              <Button accessibilityLabel="Close" onClick={onClose}>
+                Close
+              </Button>
+            </InlineStack>
+          </s-box>
+          {children}
+          {(secondaryActionNodes || primaryActionNode || footer) ? (
+            <s-box padding="base">
+              <BlockStack gap="200">
+                {footer}
+                <InlineStack align="end" gap="200">
+                  {secondaryActionNodes}
+                  {primaryActionNode}
+                </InlineStack>
+              </BlockStack>
+            </s-box>
+          ) : null}
+        </BlockStack>
+      </s-section>
+    </div>
+  );
+}
+
+Modal.Section = ModalSection as any;
+
 export function FormLayout({children}: any) {
   return <BlockStack gap="200">{children}</BlockStack>;
 }
@@ -530,34 +660,30 @@ export function Page({
   backAction,
   primaryAction,
   secondaryActions,
+  titleMetadata,
   narrowWidth,
   children,
 }: any) {
-  const primaryActionNode = isValidElement(primaryAction) ? (
-    primaryAction
-  ) : primaryAction ? (
-    <Button
-      variant="primary"
-      icon={primaryAction.icon}
-      accessibilityLabel={primaryAction.accessibilityLabel}
-      onClick={primaryAction.onAction}
-    >
-      {primaryAction.content || primaryAction.children}
-    </Button>
-  ) : null;
+  const primaryActionNode = renderActionNode(primaryAction, undefined, 'primary');
+  const secondaryActionNodes = Array.isArray(secondaryActions)
+    ? secondaryActions.map((action, index) => renderActionNode(action, index))
+    : renderActionNode(secondaryActions);
 
   return (
     <s-page inlineSize={narrowWidth ? 'small' : 'base'}>
-      {(title || subtitle || backAction || primaryActionNode || secondaryActions) ? (
+      {(title || subtitle || backAction || titleMetadata || primaryActionNode || secondaryActionNodes) ? (
         <s-box paddingBlockEnd="large-200">
           <BlockStack gap="200">
             {backAction ? <Link url={backAction.url}>{backAction.content}</Link> : null}
             <InlineStack align="space-between" blockAlign="start" gap="200">
               <BlockStack gap="100">
                 {title ? (
-                  <Text as="h1" variant="headingLg">
-                    {title}
-                  </Text>
+                  <InlineStack gap="200" blockAlign="center">
+                    <Text as="h1" variant="headingLg">
+                      {title}
+                    </Text>
+                    {titleMetadata}
+                  </InlineStack>
                 ) : null}
                 {subtitle ? (
                   <Text as="p" tone="subdued">
@@ -565,9 +691,9 @@ export function Page({
                   </Text>
                 ) : null}
               </BlockStack>
-              {(primaryActionNode || secondaryActions) ? (
+              {(primaryActionNode || secondaryActionNodes) ? (
                 <InlineStack align="end" gap="200">
-                  {secondaryActions}
+                  {secondaryActionNodes}
                   {primaryActionNode}
                 </InlineStack>
               ) : null}
@@ -581,11 +707,16 @@ export function Page({
 }
 
 export function PageActions({primaryAction, secondaryActions}: any) {
+  const primaryActionNode = renderActionNode(primaryAction, undefined, 'primary');
+  const secondaryActionNodes = Array.isArray(secondaryActions)
+    ? secondaryActions.map((action, index) => renderActionNode(action, index))
+    : renderActionNode(secondaryActions);
+
   return (
     <s-box paddingBlockStart="large-200">
       <InlineStack align="end" gap="200">
-        {secondaryActions}
-        {primaryAction}
+        {secondaryActionNodes}
+        {primaryActionNode}
       </InlineStack>
     </s-box>
   );
@@ -645,18 +776,43 @@ export function EmptySearchResult({title, description, withIllustration}: any) {
   );
 }
 
-export function ActionList({items}: {items: MenuActionDescriptor[]}) {
+export function ActionList({
+  items,
+  sections,
+  actionRole: _actionRole,
+}: {
+  items?: MenuActionDescriptor[];
+  sections?: Array<{items: MenuActionDescriptor[]}>;
+  actionRole?: string;
+}) {
+  const resolvedSections =
+    sections ?? (items ? [{items}] : []);
+
   return (
     <BlockStack gap="100">
-      {items.map((item, index) => (
-        <Button
-          key={index}
-          tone={item.destructive ? 'critical' : undefined}
-          disabled={item.disabled}
-          onClick={item.onAction}
-        >
-          {item.content}
-        </Button>
+      {resolvedSections.map((section, sectionIndex) => (
+        <BlockStack key={sectionIndex} gap="100">
+          {sectionIndex > 0 ? <Divider /> : null}
+          {section.items.map((item, itemIndex) => (
+            <Button
+              key={`${sectionIndex}-${itemIndex}`}
+              variant="tertiary"
+              tone={item.destructive ? 'critical' : undefined}
+              disabled={item.disabled}
+              icon={item.icon}
+              onClick={item.onAction}
+            >
+              <BlockStack gap="0" align="start">
+                <Text as="span">{item.content}</Text>
+                {item.helpText ? (
+                  <Text as="span" tone="subdued">
+                    {item.helpText}
+                  </Text>
+                ) : null}
+              </BlockStack>
+            </Button>
+          ))}
+        </BlockStack>
       ))}
     </BlockStack>
   );
@@ -742,6 +898,7 @@ export function InlineGrid({children, columns, gap, alignItems}: any) {
 
 type IndexTableContextValue = {
   selectable?: boolean;
+  resourceName?: {singular?: string; plural?: string};
   onSelectionChange?: (
     selectionType: SelectionType,
     isSelecting: boolean,
@@ -817,11 +974,13 @@ export function IndexFilters({
   return (
     <s-section padding="base">
       <InlineStack align="space-between" blockAlign="center" gap="200">
-        <InlineStack gap="200">
+        <InlineStack gap="200" role="tablist">
           {tabs.map((tab: TabProps, index: number) => (
             <Button
               key={tab.id}
               variant={index === selected ? 'primary' : 'secondary'}
+              role="tab"
+              aria-selected={index === selected}
               onClick={() => onSelect?.(index)}
             >
               {tab.content}
@@ -832,7 +991,7 @@ export function IndexFilters({
           {loading ? <Spinner /> : null}
           {sortOptions.length ? (
             <Select
-              label=""
+              label="Sort the results"
               labelHidden
               options={sortOptions.map((option: any) => ({
                 label: option.directionLabel
@@ -855,6 +1014,7 @@ type IndexTableProps = {
   itemCount: number;
   resourceName?: any;
   selectedItemsCount?: number | string;
+  emptyState?: React.ReactNode;
   onSelectionChange?: (
     selectionType: SelectionType,
     isSelecting: boolean,
@@ -867,19 +1027,24 @@ type IndexTableProps = {
 
 export function IndexTable({
   headings,
+  itemCount,
   selectedItemsCount,
   onSelectionChange,
   selectable,
   promotedBulkActions,
   children,
-  resourceName: _resourceName,
+  resourceName,
+  emptyState,
 }: IndexTableProps) {
+  const isSelectable = selectable ?? Boolean(onSelectionChange);
   const allSelected = selectedItemsCount === 'All';
   const selectedCount =
     selectedItemsCount === 'All' ? Number.MAX_SAFE_INTEGER : Number(selectedItemsCount || 0);
 
   return (
-    <IndexTableContext.Provider value={{selectable, onSelectionChange}}>
+    <IndexTableContext.Provider
+      value={{selectable: isSelectable, resourceName, onSelectionChange}}
+    >
       <BlockStack gap="0">
         {selectedCount > 0 && promotedBulkActions?.length ? (
           <s-section padding="base">
@@ -906,12 +1071,13 @@ export function IndexTable({
               's-table-header-row' as any,
               {role: 'row'},
               ...[
-                selectable
+                isSelectable
                   ? React.createElement(
                       's-table-cell' as any,
                       {key: '__select__', role: 'columnheader'},
                       React.createElement(Checkbox as any, {
                         label: '',
+                        accessibilityLabel: `Select all ${resourceName?.plural ?? 'items'}`,
                         checked: allSelected,
                         onChange: (checked: boolean) =>
                           onSelectionChange?.('all', checked),
@@ -936,6 +1102,7 @@ export function IndexTable({
           ),
           React.createElement('s-table-body' as any, {role: 'rowgroup'}, children),
         )}
+        {itemCount === 0 ? emptyState : null}
       </BlockStack>
     </IndexTableContext.Provider>
   );
@@ -948,7 +1115,7 @@ IndexTable.Row = function IndexTableRow({
   onClick,
   accessibilityLabel,
 }: any) {
-  const {selectable, onSelectionChange} = useContext(IndexTableContext);
+  const {selectable, resourceName, onSelectionChange} = useContext(IndexTableContext);
 
   return (
     React.createElement(
@@ -969,7 +1136,9 @@ IndexTable.Row = function IndexTableRow({
               },
               React.createElement(Checkbox as any, {
                 label: '',
-                accessibilityLabel,
+                accessibilityLabel:
+                  accessibilityLabel ??
+                  `Select ${resourceName?.singular ?? 'item'}`,
                 checked: selected,
                 onChange: (checked: boolean) =>
                   onSelectionChange?.('single', checked, id),

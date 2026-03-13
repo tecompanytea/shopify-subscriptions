@@ -6,8 +6,8 @@ import {
   IndexFilters,
   IndexTable,
   Text,
+  type SelectionType,
 } from '~/components/polaris';
-import type {SelectionType} from '@shopify/polaris/build/ts/src/utilities/use-index-resource-state';
 import {useTranslation} from 'react-i18next';
 import {StatusBadge} from '~/components';
 import {useDeliveryFrequencyFormatter, useProductCountFormatter} from '~/hooks';

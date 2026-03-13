@@ -11,8 +11,8 @@ import {
   Text,
   TextField,
 } from '~/components/polaris';
-import {AppProvider} from '@shopify/shopify-app-react-router/react';
 import {useCallback, useState} from 'react';
+import {ShopifyAppProvider} from '~/components/ShopifyAppProvider';
 
 import {login} from '../../shopify.server';
 
@@ -43,7 +43,7 @@ export default function App() {
   );
 
   return (
-    <AppProvider embedded={false}>
+    <ShopifyAppProvider embedded={false}>
       <section
         style={{
           display: 'flex',
@@ -85,6 +85,6 @@ export default function App() {
           </InlineStack>
         </Page>
       </section>
-    </AppProvider>
+    </ShopifyAppProvider>
   );
 }

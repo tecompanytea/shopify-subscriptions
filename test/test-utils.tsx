@@ -1,6 +1,5 @@
 import type {RemixStubProps} from '@remix-run/testing';
 import {createRemixStub} from '@remix-run/testing';
-import {PolarisTestProvider} from '@shopify/polaris';
 import {render} from '@testing-library/react';
 import {parse} from 'graphql';
 import type {ReactElement} from 'react';
@@ -9,8 +8,6 @@ import {vi} from 'vitest';
 import type {ShopContextValue} from '~/context/ShopContext';
 import ShopContext from '~/context/ShopContext';
 import i18n from './utils/i18nextTest';
-
-import polarisTranslations from '@shopify/polaris/locales/en.json';
 
 /**
  * Mount a component with react testing library
@@ -34,9 +31,7 @@ function mountWithAppContext(
       }}
     >
       <I18nextProvider i18n={i18n}>
-        <PolarisTestProvider i18n={polarisTranslations}>
-          {element}
-        </PolarisTestProvider>
+        {element}
       </I18nextProvider>
     </ShopContext.Provider>,
   );

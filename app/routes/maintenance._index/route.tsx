@@ -1,4 +1,4 @@
-import {AppProvider} from '@shopify/shopify-app-react-router/react';
+import {ShopifyAppProvider} from '~/components/ShopifyAppProvider';
 import {Layout, Page, Text} from '~/components/polaris';
 
 export async function loader() {
@@ -11,7 +11,7 @@ export async function action() {
 
 export default function Maintenance() {
   return (
-    <AppProvider embedded={false}>
+    <ShopifyAppProvider embedded={false}>
       <Page title="Scheduled maintenance">
         <Layout>
           <Layout.Section>
@@ -22,6 +22,6 @@ export default function Maintenance() {
           </Layout.Section>
         </Layout>
       </Page>
-    </AppProvider>
+    </ShopifyAppProvider>
   );
 }
