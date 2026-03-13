@@ -2,7 +2,10 @@ import type {TypedResponse} from '@remix-run/node';
 import type {NodeEnv} from 'config/types';
 import type {CurrencyCode, SubscriptionBillingCycle} from 'types/admin.types';
 import type {CycleDiscountAdjustmentValue} from '~/routes/app.contracts.$id.edit/validator';
-import type {DiscountTypeType} from '~/routes/app.plans.$id/validator';
+import type {
+  DiscountTypeType,
+  SellingPlanModeType,
+} from '~/routes/app.plans.$id/validator';
 import type {
   InventoryNotificationFrequencyTypeType,
   OnFailureTypeType,
@@ -71,10 +74,12 @@ export interface SellingPlanGroup {
   planName: string;
   offerDiscount: string;
   discountType: DiscountTypeType;
+  sellingPlanMode: SellingPlanModeType;
   discountDeliveryOptions: DiscountDeliveryOption[];
   products: Product[];
   selectedProductIds: string;
   selectedProductVariantIds: string;
+  hasUnsupportedSellingPlans?: boolean;
 }
 
 export interface DiscountDeliveryOption {
@@ -82,6 +87,7 @@ export interface DiscountDeliveryOption {
   deliveryFrequency: number;
   deliveryInterval: DeliveryFrequencyIntervalType;
   discountValue?: number;
+  prepaidDeliveriesCount?: number;
 }
 
 export interface SellingPlan {

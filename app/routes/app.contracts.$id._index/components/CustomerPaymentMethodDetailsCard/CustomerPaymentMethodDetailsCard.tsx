@@ -7,8 +7,8 @@ import {
   InlineStack,
   Popover,
   Text,
-} from '@shopify/polaris';
-import {EditIcon} from '@shopify/polaris-icons';
+} from '~/components/polaris';
+import {EditIcon} from '~/components/polaris-icons';
 import {useCallback, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import PaymentIcon from '~/components/PaymentIcon/PaymentIcon';

@@ -1,4 +1,4 @@
-import {Badge} from '@shopify/polaris';
+import {Badge} from '~/components/polaris';
 import {useTranslation} from 'react-i18next';
 import type {SubscriptionContractStatusType} from '~/types';
 import {SubscriptionContractStatus} from '~/types';

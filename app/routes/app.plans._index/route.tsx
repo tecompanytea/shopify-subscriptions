@@ -9,8 +9,8 @@ import {
   Page,
   Text,
   Button,
-} from '@shopify/polaris';
-import {PlusCircleIcon} from '@shopify/polaris-icons';
+} from '~/components/polaris';
+import {PlusCircleIcon} from '~/components/polaris-icons';
 import {useTranslation} from 'react-i18next';
 import type {ValidationErrorResponseData} from '@rvf/remix';
 import {TablePagination} from '~/components';

@@ -1,5 +1,5 @@
 import {HttpResponseError} from '@shopify/shopify-api';
-import {SessionNotFoundError} from '@shopify/shopify-app-remix/server';
+import {SessionNotFoundError} from '@shopify/shopify-app-react-router/server';
 import {describe, expect, it} from 'vitest';
 import {Job} from '../Job';
 

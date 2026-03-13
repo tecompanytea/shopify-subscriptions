@@ -1,10 +1,10 @@
 import {useFormContext} from '@rvf/remix';
-import type {SelectProps as PolarisSelectProps} from '@shopify/polaris';
-import {Select as PolarisSelect} from '@shopify/polaris';
+import {Select as PolarisSelect} from '~/components/polaris';
 
-type SelectProps = Omit<PolarisSelectProps, 'autoComplete'> & {
+type SelectProps = {
   name: string;
   label: string;
+  [key: string]: any;
 };
 
 export const Select = ({name, label, ...rest}: SelectProps) => {

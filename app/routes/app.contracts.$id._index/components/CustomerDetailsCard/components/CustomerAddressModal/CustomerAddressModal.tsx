@@ -3,7 +3,7 @@ import {useFetcher} from '@remix-run/react';
 import type {Address as AddressType} from '@shopify/address';
 import {parseGid} from '@shopify/admin-graphql-api-utilities';
 import {Modal, TitleBar} from '@shopify/app-bridge-react';
-import {Banner, Box, Divider, Link, RadioButton} from '@shopify/polaris';
+import {Banner, Box, Divider, Link, RadioButton} from '~/components/polaris';
 import {Fragment, useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Address} from '~/components/Address/Address';

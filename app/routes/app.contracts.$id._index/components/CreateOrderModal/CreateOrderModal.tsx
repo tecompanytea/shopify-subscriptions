@@ -6,10 +6,10 @@ import {
   InlineStack,
   Text,
   Thumbnail,
-} from '@shopify/polaris';
+} from '~/components/polaris';
 import {Modal, TitleBar} from '@shopify/app-bridge-react';
 import {useTranslation} from 'react-i18next';
-import {AlertTriangleIcon, ImageIcon} from '@shopify/polaris-icons';
+import {AlertTriangleIcon, ImageIcon} from '~/components/polaris-icons';
 import type {InsufficientStockProductVariants} from '~/types';
 
 interface CreateOrderModalProps {

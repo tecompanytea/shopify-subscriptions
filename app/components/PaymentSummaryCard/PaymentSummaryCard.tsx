@@ -1,4 +1,4 @@
-import {BlockStack, Box, Card, InlineStack, Text} from '@shopify/polaris';
+import {BlockStack, Box, Card, InlineStack, Text} from '~/components/polaris';
 import {useTranslation} from 'react-i18next';
 import type {Money} from '~/types';
 import type {SubscriptionDeliveryMethod} from '~/types/contracts';

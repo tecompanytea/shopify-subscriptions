@@ -13,6 +13,7 @@ export interface SellingPlanGroupListItem {
 export interface SellingPlanGroupListItemSellingPlan {
   id?: string;
   pricingPolicies?: SellingPlanPricingPolicy[];
+  billingPolicy?: RecurringPolicy;
   deliveryPolicy: RecurringPolicy;
 }
 

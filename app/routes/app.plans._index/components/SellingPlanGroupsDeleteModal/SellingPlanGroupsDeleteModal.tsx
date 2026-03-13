@@ -1,5 +1,5 @@
 import {useFetcher} from '@remix-run/react';
-import {Box, Text} from '@shopify/polaris';
+import {Box, Text} from '~/components/polaris';
 import {Modal, TitleBar} from '@shopify/app-bridge-react';
 import {useEffect} from 'react';
 import {useTranslation} from 'react-i18next';
@@ -37,7 +37,7 @@ export default function SellingPlanGroupsDeleteModal({
   };
 
   useEffect(() => {
-    if (!isLoadingOrSubmitting) {
+    if (!isLoadingOrSubmitting && fetcher.data) {
       setIsDeleteModalVisible(false);
       clearSelection();
       showToasts(fetcher.data);

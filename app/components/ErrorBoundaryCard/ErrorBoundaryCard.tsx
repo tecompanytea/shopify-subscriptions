@@ -1,4 +1,4 @@
-import {Card, Text, EmptyState, Link, Page} from '@shopify/polaris';
+import {Card, Text, EmptyState, Link, Page} from '~/components/polaris';
 import {useTranslation} from 'react-i18next';
 
 export const ErrorBoundaryCard = () => {

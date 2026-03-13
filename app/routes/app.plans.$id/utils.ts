@@ -6,14 +6,19 @@ import type {
 } from 'types/admin.types';
 import type {
   Product,
+  RecurringPolicy,
   SellingPlanGroup,
   SellingPlanGroupProduct,
   SellingPlanGroupProductVariant,
 } from '~/types';
 import {formatPrice} from '~/utils/helpers/money';
 import {DeliveryFrequencyInterval} from '~/utils/helpers/zod';
-import type {DiscountDeliveryOption, DiscountTypeType} from './validator';
-import {DiscountType} from './validator';
+import type {
+  DiscountDeliveryOption,
+  DiscountTypeType,
+  SellingPlanModeType,
+} from './validator';
+import {DiscountType, SellingPlanMode} from './validator';
 
 export const NEW_DELIVERY_OPTION_ID = 'NewDeliveryOption';
 
@@ -22,21 +27,27 @@ export const defaultDiscountDeliveryOption = {
   deliveryFrequency: 1,
   deliveryInterval: DeliveryFrequencyInterval.Week,
   discountValue: undefined,
+  prepaidDeliveriesCount: 3,
 };
 
 /**
  * Gets the empty selling plan to be returned by the loader
  */
-export function getEmptySellingPlan(t: TFunction): SellingPlanGroup {
+export function getEmptySellingPlan(
+  t: TFunction,
+  sellingPlanMode: SellingPlanModeType = SellingPlanMode.RECURRING,
+): SellingPlanGroup {
   return {
     merchantCode: '',
     planName: t('defaultPurchaseOptionTitle'),
     offerDiscount: 'on',
     discountType: DiscountType.PERCENTAGE,
+    sellingPlanMode,
     discountDeliveryOptions: [defaultDiscountDeliveryOption],
     products: [],
     selectedProductIds: '',
     selectedProductVariantIds: '',
+    hasUnsupportedSellingPlans: false,
   };
 }
 
@@ -136,6 +147,7 @@ export function getSellingPlansFromDiscountDeliveryOptions(
   discountType: DiscountTypeType,
   offerDiscount: boolean,
   currencyCode: string,
+  sellingPlanMode: SellingPlanModeType,
   t: TFunction,
   locale: string,
 ) {
@@ -145,8 +157,13 @@ export function getSellingPlansFromDiscountDeliveryOptions(
       deliveryFrequency: deliveryFrequencyString,
       deliveryInterval,
       discountValue,
+      prepaidDeliveriesCount,
     }) => {
       const deliveryFrequency = Number(deliveryFrequencyString);
+      const billingFrequency =
+        sellingPlanMode === SellingPlanMode.PREPAID
+          ? deliveryFrequency * Number(prepaidDeliveriesCount)
+          : deliveryFrequency;
 
       const information = sellingPlanInformation(
         t,
@@ -156,11 +173,17 @@ export function getSellingPlansFromDiscountDeliveryOptions(
         currencyCode,
         deliveryInterval,
         deliveryFrequency,
+        sellingPlanMode,
+        prepaidDeliveriesCount,
       );
 
-      const recurringDeliveryAndBillingPolicy = {
+      const recurringDeliveryPolicy = {
         interval: deliveryInterval as SellingPlanInterval,
         intervalCount: deliveryFrequency,
+      };
+      const recurringBillingPolicy = {
+        interval: deliveryInterval as SellingPlanInterval,
+        intervalCount: billingFrequency,
       };
 
       const adjustmentValue =
@@ -183,10 +206,10 @@ export function getSellingPlansFromDiscountDeliveryOptions(
         options: [information.option],
         category: 'SUBSCRIPTION' as SellingPlanCategory,
         billingPolicy: {
-          recurring: recurringDeliveryAndBillingPolicy,
+          recurring: recurringBillingPolicy,
         },
         deliveryPolicy: {
-          recurring: recurringDeliveryAndBillingPolicy,
+          recurring: recurringDeliveryPolicy,
         },
         pricingPolicies:
           discountValue && offerDiscount ? [pricingPolicies] : [],
@@ -203,6 +226,8 @@ export function sellingPlanInformation(
   currencyCode: string,
   deliveryIntervalField: string,
   deliveryFrequency: number,
+  sellingPlanMode: SellingPlanModeType = SellingPlanMode.RECURRING,
+  prepaidDeliveriesCount?: number,
 ) {
   let deliveryInterval;
   let discountText;
@@ -225,6 +250,17 @@ export function sellingPlanInformation(
         intervalCount: deliveryFrequency,
         count: Number(deliveryFrequency),
       });
+  }
+
+  if (
+    sellingPlanMode === SellingPlanMode.PREPAID &&
+    prepaidDeliveriesCount &&
+    prepaidDeliveriesCount > 1
+  ) {
+    deliveryInterval = t('summaryCard.prepaidDelivery', {
+      deliveryText: deliveryInterval,
+      count: prepaidDeliveriesCount,
+    });
   }
 
   if (!discountValue || !discountType) {
@@ -259,6 +295,56 @@ export function sellingPlanInformation(
   return {
     option: deliveryInterval,
     sellingPlanName: `${deliveryInterval}, ${discountText}`,
+  };
+}
+
+export function inferSellingPlanModeFromPolicies({
+  billingPolicy,
+  deliveryPolicy,
+}: {
+  billingPolicy?: Partial<RecurringPolicy> | null;
+  deliveryPolicy?: Partial<RecurringPolicy> | null;
+}): {
+  isSupported: boolean;
+  mode: SellingPlanModeType;
+  prepaidDeliveriesCount?: number;
+} {
+  if (
+    !billingPolicy?.interval ||
+    !deliveryPolicy?.interval ||
+    !billingPolicy.intervalCount ||
+    !deliveryPolicy.intervalCount
+  ) {
+    return {isSupported: false, mode: SellingPlanMode.RECURRING};
+  }
+
+  if (
+    billingPolicy.interval === deliveryPolicy.interval &&
+    billingPolicy.intervalCount === deliveryPolicy.intervalCount
+  ) {
+    return {isSupported: true, mode: SellingPlanMode.RECURRING};
+  }
+
+  if (
+    billingPolicy.interval === deliveryPolicy.interval &&
+    billingPolicy.intervalCount > deliveryPolicy.intervalCount &&
+    billingPolicy.intervalCount % deliveryPolicy.intervalCount === 0
+  ) {
+    return {
+      isSupported: true,
+      mode: SellingPlanMode.PREPAID,
+      prepaidDeliveriesCount:
+        billingPolicy.intervalCount / deliveryPolicy.intervalCount,
+    };
+  }
+
+  return {
+    isSupported: false,
+    mode:
+      billingPolicy.interval !== deliveryPolicy.interval ||
+      billingPolicy.intervalCount !== deliveryPolicy.intervalCount
+        ? SellingPlanMode.PREPAID
+        : SellingPlanMode.RECURRING,
   };
 }
 

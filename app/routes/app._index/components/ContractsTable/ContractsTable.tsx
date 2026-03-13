@@ -1,4 +1,4 @@
-import {useState, useCallback} from 'react';
+import {useState, useCallback, useEffect, useRef} from 'react';
 import {useNavigate} from '@remix-run/react';
 import {parseGid} from '@shopify/admin-graphql-api-utilities';
 import {
@@ -6,7 +6,7 @@ import {
   IndexFilters,
   IndexTable,
   Text,
-} from '@shopify/polaris';
+} from '~/components/polaris';
 import type {SelectionType} from '@shopify/polaris/build/ts/src/utilities/use-index-resource-state';
 import {useTranslation} from 'react-i18next';
 import {StatusBadge} from '~/components';
@@ -15,6 +15,7 @@ import {
   SubscriptionContractStatus,
   type SubscriptionContractListItem,
 } from '~/types/contracts';
+import {useFormatDate} from '~/utils/helpers/date';
 import {useContractListState} from '../../hooks/useContractListState';
 import styles from './ContractsTable.module.css';
 import {formatStatus, hasInventoryError} from '~/utils/helpers/contracts';
@@ -48,9 +49,42 @@ export function ContractsTable({
   const navigate = useNavigate();
   const productCountFormatter = useProductCountFormatter();
   const {deliveryFrequencyText} = useDeliveryFrequencyFormatter();
+  const formatDate = useFormatDate();
   const [pauseModalOpen, setPauseModalOpen] = useState(false);
   const [activateModalOpen, setActivateModalOpen] = useState(false);
   const [cancelModalOpen, setCancelModalOpen] = useState(false);
+  const [layoutVersion, setLayoutVersion] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    let animationFrame = requestAnimationFrame(() => {
+      setLayoutVersion((currentVersion) => currentVersion + 1);
+    });
+
+    if (typeof ResizeObserver === 'undefined' || !containerRef.current) {
+      return () => cancelAnimationFrame(animationFrame);
+    }
+
+    let previousWidth = containerRef.current.getBoundingClientRect().width;
+    const resizeObserver = new ResizeObserver(([entry]) => {
+      const nextWidth = entry.contentRect.width;
+
+      if (nextWidth <= 0 || nextWidth === previousWidth) return;
+
+      previousWidth = nextWidth;
+      cancelAnimationFrame(animationFrame);
+      animationFrame = requestAnimationFrame(() => {
+        setLayoutVersion((currentVersion) => currentVersion + 1);
+      });
+    });
+
+    resizeObserver.observe(containerRef.current);
+
+    return () => {
+      cancelAnimationFrame(animationFrame);
+      resizeObserver.disconnect();
+    };
+  }, []);
   const closePauseModal = useCallback(() => {
     setPauseModalOpen(false);
     clearSelection();
@@ -130,6 +164,25 @@ export function ContractsTable({
     />
   );
 
+  const shouldShowWarningColumn = hasContractsWithInventoryError;
+
+  const headings = [
+    {title: t('table.headings.contract')},
+    ...(shouldShowWarningColumn
+      ? [{title: t('table.headings.warning'), hidden: true}]
+      : []),
+    {title: t('table.headings.customer')},
+    {title: t('table.headings.product')},
+    {title: t('table.headings.price')},
+    {title: t('table.headings.deliveryFrequency')},
+    {
+      title: t('table.headings.nextBillingDate', {
+        defaultValue: 'Next billing',
+      }),
+    },
+    {title: t('table.headings.status')},
+  ];
+
   const contractRowsMarkup = contracts?.map((contract, index) => {
     return (
       <IndexTable.Row
@@ -144,16 +197,18 @@ export function ContractsTable({
             {parseGid(contract.id)}
           </Text>
         </IndexTable.Cell>
-        <IndexTable.Cell>
-          {hasInventoryError(contract) ? (
-            <InventoryErrorPopover
-              insufficientStockProductVariants={
-                contract.billingAttempts[0]?.processingError
-                  ?.insufficientStockProductVariants
-              }
-            />
-          ) : null}
-        </IndexTable.Cell>
+        {shouldShowWarningColumn ? (
+          <IndexTable.Cell>
+            {hasInventoryError(contract) ? (
+              <InventoryErrorPopover
+                insufficientStockProductVariants={
+                  contract.billingAttempts[0]?.processingError
+                    ?.insufficientStockProductVariants
+                }
+              />
+            ) : null}
+          </IndexTable.Cell>
+        ) : null}
         <IndexTable.Cell>{contract.customer?.displayName}</IndexTable.Cell>
         <IndexTable.Cell>
           {productCountFormatter(contract.lines, contract.lineCount)}
@@ -167,6 +222,11 @@ export function ContractsTable({
         </IndexTable.Cell>
         <IndexTable.Cell>
           {deliveryFrequencyText(contract.deliveryPolicy)}
+        </IndexTable.Cell>
+        <IndexTable.Cell>
+          {contract.nextBillingDate
+            ? formatDate(contract.nextBillingDate, locale)
+            : '-'}
         </IndexTable.Cell>
         <IndexTable.Cell>
           <StatusBadge status={formatStatus(contract.status)} />
@@ -183,53 +243,49 @@ export function ContractsTable({
 
   return (
     <>
-      <IndexFilters
-        loading={listLoading}
-        tabs={tabs}
-        selected={selectedTab}
-        onSelect={(selectedTabIndex) => handleTabSelect(selectedTabIndex)}
-        mode={filtersMode}
-        setMode={setFiltersMode}
-        sortOptions={sortOptions}
-        onSort={onSort}
-        sortSelected={sortSelected}
-        onQueryChange={() => {}}
-        onQueryClear={() => {}}
-        cancelAction={{
-          onAction: () => {},
-          disabled: false,
-          loading: false,
-        }}
-        canCreateNewView={false}
-        filters={[]}
-        onClearAll={() => {}}
-        hideFilters
-        hideQueryField
-      />
-      <IndexTable
-        resourceName={{
-          singular: t('table.resourceName.singular'),
-          plural: t('table.resourceName.plural'),
-        }}
-        itemCount={contracts?.length}
-        headings={[
-          {title: t('table.headings.contract')},
-          {title: t('table.headings.warning'), hidden: true},
-          {title: t('table.headings.customer')},
-          {title: t('table.headings.product')},
-          {title: t('table.headings.price')},
-          {title: t('table.headings.deliveryFrequency')},
-          {title: t('table.headings.status')},
-        ]}
-        selectedItemsCount={
-          allResourcesSelected ? 'All' : selectedResources.length
-        }
-        onSelectionChange={handleSelectionChange}
-        emptyState={emptyStateMarkup}
-        promotedBulkActions={bulkActions}
-      >
-        {contractRowsMarkup}
-      </IndexTable>
+      <div ref={containerRef}>
+        <IndexFilters
+          key={`contracts-filters-${layoutVersion}`}
+          loading={listLoading}
+          tabs={tabs}
+          selected={selectedTab}
+          onSelect={(selectedTabIndex) => handleTabSelect(selectedTabIndex)}
+          mode={filtersMode}
+          setMode={setFiltersMode}
+          sortOptions={sortOptions}
+          onSort={onSort}
+          sortSelected={sortSelected}
+          onQueryChange={() => {}}
+          onQueryClear={() => {}}
+          cancelAction={{
+            onAction: () => {},
+            disabled: false,
+            loading: false,
+          }}
+          canCreateNewView={false}
+          filters={[]}
+          onClearAll={() => {}}
+          hideFilters
+          hideQueryField
+        />
+        <IndexTable
+          key={`contracts-table-${layoutVersion}`}
+          resourceName={{
+            singular: t('table.resourceName.singular'),
+            plural: t('table.resourceName.plural'),
+          }}
+          itemCount={contracts?.length}
+          headings={headings}
+          selectedItemsCount={
+            allResourcesSelected ? 'All' : selectedResources.length
+          }
+          onSelectionChange={handleSelectionChange}
+          emptyState={emptyStateMarkup}
+          promotedBulkActions={bulkActions}
+        >
+          {contractRowsMarkup}
+        </IndexTable>
+      </div>
       <BulkActionModal
         selectedResources={omitSelectedResourcesByStatus(
           SubscriptionContractStatus.Paused,

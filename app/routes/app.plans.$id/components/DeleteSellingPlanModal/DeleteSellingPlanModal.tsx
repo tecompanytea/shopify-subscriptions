@@ -1,5 +1,5 @@
 import {useFetcher} from '@remix-run/react';
-import {Box, Text} from '@shopify/polaris';
+import {Box, Text} from '~/components/polaris';
 import {Modal, TitleBar} from '@shopify/app-bridge-react';
 import {useFormContext} from '@rvf/remix';
 import {useEffect} from 'react';

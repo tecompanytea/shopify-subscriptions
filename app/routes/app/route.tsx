@@ -2,18 +2,15 @@ import {json} from '@remix-run/node';
 import {Link, Outlet, useLoaderData, useRouteError} from '@remix-run/react';
 import {parseGid} from '@shopify/admin-graphql-api-utilities';
 import {NavMenu} from '@shopify/app-bridge-react';
-import polarisStyles from '@shopify/polaris/build/esm/styles.css?url';
-import {boundary} from '@shopify/shopify-app-remix/server';
-import {AppProvider} from '@shopify/shopify-app-remix/react';
+import {boundary} from '@shopify/shopify-app-react-router/server';
+import {AppProvider} from '@shopify/shopify-app-react-router/react';
 import {useTranslation} from 'react-i18next';
 import ShopContext from '~/context/ShopContext';
 import {ErrorBoundaryCard} from '~/components/ErrorBoundaryCard';
 
-import i18nextServer from '~/i18n/i18next.server';
 import {getShopInfos} from '~/models/ShopInfo/ShopInfo.server';
 import {authenticate} from '~/shopify.server';
 import {missingApprovedScopes} from '~/utils/missingApprovedScopes';
-export const links = () => [{rel: 'stylesheet', href: polarisStyles}];
 
 export const handle = {
   i18n: 'common',
@@ -28,15 +25,6 @@ export async function loader({request}) {
   ) {
     return redirect('/missing-scopes');
   }
-  const lng = await i18nextServer.getLocale(request);
-
-  // In order for vite to know what to inject into the rollup bundle
-  // there are some rules for dynamic imports.
-  // The import must start with `./` or `../`
-  // See https://github.com/rollup/plugins/tree/master/packages/dynamic-import-vars#limitations
-  const polarisTranslations = await import(
-    `../../../node_modules/@shopify/polaris/locales/${lng}.json`
-  );
 
   const shopInfos = await getShopInfos(admin.graphql);
   const {shop} = shopInfos;
@@ -46,7 +34,6 @@ export async function loader({request}) {
   const shopifyDomain = primaryDomain.url as string;
 
   return json({
-    polarisTranslations,
     apiKey: process.env.SHOPIFY_API_KEY || '',
     shopId,
     name,
@@ -61,7 +48,6 @@ export async function loader({request}) {
 export default function App() {
   const {
     apiKey,
-    polarisTranslations,
     shopId,
     name,
     shopifyDomain,
@@ -84,13 +70,7 @@ export default function App() {
 
   return (
     <>
-      <AppProvider
-        apiKey={apiKey}
-        i18n={polarisTranslations}
-        features={{
-          polarisSummerEditions2023: true,
-        }}
-      >
+      <AppProvider embedded apiKey={apiKey}>
         <ShopContext.Provider value={shopInfo}>
           <NavMenu>
             <Link to="/app" rel="home">
@@ -130,7 +110,7 @@ export function ErrorBoundary() {
     }
 
     return (
-      <AppProvider isEmbeddedApp apiKey={getApiKey()}>
+      <AppProvider embedded apiKey={getApiKey()}>
         <ErrorBoundaryCard />
       </AppProvider>
     );

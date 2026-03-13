@@ -2,7 +2,6 @@ import {json, redirect} from '@remix-run/node';
 import type {MetaFunction} from '@remix-run/react';
 import {Form, useLoaderData} from '@remix-run/react';
 import {
-  AppProvider,
   BlockStack,
   Button,
   Card,
@@ -11,31 +10,14 @@ import {
   Page,
   Text,
   TextField,
-} from '@shopify/polaris';
-import polarisStyles from '@shopify/polaris/build/esm/styles.css?url';
+} from '~/components/polaris';
+import {AppProvider} from '@shopify/shopify-app-react-router/react';
 import {useCallback, useState} from 'react';
 
-import i18nextServer from '~/i18n/i18next.server';
 import {login} from '../../shopify.server';
-
-export const links = () => [
-  {
-    rel: 'stylesheet',
-    href: polarisStyles,
-  },
-];
 
 export async function loader({request}) {
   const url = new URL(request.url);
-  const lng = await i18nextServer.getLocale(request);
-
-  // In order for vite to know what to inject into the rollup bundle
-  // there are some rules for dynamic imports.
-  // The import must start with `./` or `../`
-  // See https://github.com/rollup/plugins/tree/master/packages/dynamic-import-vars#limitations
-  const polarisTranslations = await import(
-    `../../../node_modules/@shopify/polaris/locales/${lng}.json`
-  );
 
   if (url.searchParams.get('shop')) {
     throw redirect(`/app?${url.searchParams.toString()}`);
@@ -43,7 +25,6 @@ export async function loader({request}) {
 
   return json({
     showForm: Boolean(login),
-    polarisTranslations,
   });
 }
 
@@ -52,7 +33,7 @@ export const meta: MetaFunction = () => {
 };
 
 export default function App() {
-  const {showForm, polarisTranslations} = useLoaderData<typeof loader>();
+  const {showForm} = useLoaderData<typeof loader>();
 
   const [textFieldValue, setTextFieldValue] = useState('');
 
@@ -62,12 +43,7 @@ export default function App() {
   );
 
   return (
-    <AppProvider
-      i18n={polarisTranslations}
-      features={{
-        polarisSummerEditions2023: true,
-      }}
-    >
+    <AppProvider embedded={false}>
       <section
         style={{
           display: 'flex',

@@ -1,5 +1,5 @@
 import {useNavigation, useSearchParams} from '@remix-run/react';
-import {BlockStack, Box, InlineStack, Pagination} from '@shopify/polaris';
+import {BlockStack, Box, InlineStack, Pagination} from '~/components/polaris';
 import {useEffect} from 'react';
 import type {PaginationInfo} from '~/types';
 

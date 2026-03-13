@@ -93,6 +93,7 @@ export async function getContracts(
     ({
       id,
       customer,
+      nextBillingDate,
       deliveryPolicy,
       status,
       lines,
@@ -120,6 +121,7 @@ export async function getContracts(
       return {
         id,
         customer: {displayName: customer?.displayName},
+        nextBillingDate,
         deliveryPolicy: {
           interval: deliveryPolicy?.interval,
           intervalCount: deliveryPolicy?.intervalCount,

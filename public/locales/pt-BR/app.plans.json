@@ -2,12 +2,17 @@
   "page": {
     "title": "Planos de assinatura",
     "createPlan": "Plano",
-    "accessibilityLabel": "Criar plano de assinatura"
+    "createRecurringPlan": "Plano recorrente",
+    "createPrepaidPlan": "Plano pré-pago",
+    "accessibilityLabel": "Criar plano de assinatura",
+    "prepaidAccessibilityLabel": "Criar plano de assinatura pré-pago"
   },
   "emptyState": {
     "title": "Consiga mais compras recorrentes",
     "description": "Permita que os clientes comprem produtos ou serviços de maneira recorrente",
-    "action": "Plano de assinatura"
+    "action": "Plano de assinatura",
+    "recurringAction": "Plano recorrente",
+    "prepaidAction": "Plano pré-pago"
   },
   "table": {
     "headings": {

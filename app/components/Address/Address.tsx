@@ -1,6 +1,6 @@
 import type {Address as AddressType} from '@shopify/address';
 import AddressFormatter from '@shopify/address';
-import {BlockStack, Text} from '@shopify/polaris';
+import {BlockStack, Text} from '~/components/polaris';
 import {useEffect, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 

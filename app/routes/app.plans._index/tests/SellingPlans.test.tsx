@@ -35,7 +35,9 @@ describe('Subscriptions index page', () => {
   it('triggers a navigation to the create plan page when the primary action button is clicked', async () => {
     await mountSellingPlansList();
 
-    await userEvent.click(screen.getByText('Plan'));
+    await userEvent.click(
+      screen.getByRole('button', {name: 'Create subscription plan'}),
+    );
 
     expect(
       await screen.findByText('Create subscription plan'),
@@ -62,8 +64,7 @@ describe('Subscriptions index page', () => {
         'Allow customers to purchase products or services on a recurring basis',
       ),
     ).toBeInTheDocument();
-    expect(screen.queryByText(/^Plan$/)).not.toBeInTheDocument();
-    expect(screen.queryByText(/^Subscription plan$/)).toBeInTheDocument();
+    expect(screen.getByText('Subscription plan')).toBeInTheDocument();
   });
 
   it('displays plan deleted toast when the planDeleted search param is present', async () => {

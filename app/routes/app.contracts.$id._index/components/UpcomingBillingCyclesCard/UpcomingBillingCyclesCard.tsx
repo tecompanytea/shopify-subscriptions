@@ -6,7 +6,7 @@ import {
   Icon,
   InlineStack,
   Text,
-} from '@shopify/polaris';
+} from '~/components/polaris';
 import {useTranslation} from 'react-i18next';
 
 import {Link} from '@remix-run/react';
@@ -19,7 +19,7 @@ import type {
 import {NUM_BILLING_CYCLES_TO_SHOW} from '~/utils/constants';
 import {useFormatDate} from '~/utils/helpers/date';
 import {SkipBillingCycleForm} from './components/SkipBillingCycleForm/SkipBillingCycleForm';
-import {AlertCircleIcon} from '@shopify/polaris-icons';
+import {AlertCircleIcon} from '~/components/polaris-icons';
 import styles from './UpcomingBillingCyclesCard.module.css';
 
 interface Props {

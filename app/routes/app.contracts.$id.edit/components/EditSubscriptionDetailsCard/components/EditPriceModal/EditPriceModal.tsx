@@ -6,7 +6,7 @@ import {
   InlineStack,
   TextField as PolarisTextField,
   Text,
-} from '@shopify/polaris';
+} from '~/components/polaris';
 import {Modal, TitleBar} from '@shopify/app-bridge-react';
 import {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';

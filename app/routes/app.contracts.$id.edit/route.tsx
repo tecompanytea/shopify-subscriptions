@@ -2,7 +2,7 @@ import type {ActionFunctionArgs, TypedResponse} from '@remix-run/node';
 import {json} from '@remix-run/node';
 import {useLoaderData} from '@remix-run/react';
 import {composeGid, parseGid} from '@shopify/admin-graphql-api-utilities';
-import {BlockStack, Page, PageActions} from '@shopify/polaris';
+import {BlockStack, Page, PageActions} from '~/components/polaris';
 import {useTranslation} from 'react-i18next';
 import {StatusBadge} from '~/components';
 import {Form} from '~/components/Form';

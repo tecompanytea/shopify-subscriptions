@@ -36,6 +36,10 @@ const sellingPlanEdgePercentage = {
       interval: 'WEEK',
       intervalCount: 2,
     },
+    deliveryPolicy: {
+      interval: 'WEEK',
+      intervalCount: 2,
+    },
     pricingPolicies: [
       {
         adjustmentType: 'PERCENTAGE',
@@ -85,6 +89,10 @@ const sellingPlanEdgeFixedAmount = {
       interval: 'MONTH',
       intervalCount: 3,
     },
+    deliveryPolicy: {
+      interval: 'MONTH',
+      intervalCount: 3,
+    },
     pricingPolicies: [
       {
         adjustmentType: 'FIXED_AMOUNT',
@@ -104,12 +112,38 @@ const sellingPlanEdgePrice = {
       interval: 'WEEK',
       intervalCount: 2,
     },
+    deliveryPolicy: {
+      interval: 'WEEK',
+      intervalCount: 2,
+    },
     pricingPolicies: [
       {
         adjustmentType: 'PRICE',
         adjustmentValue: {
           amount: 10,
           currencyCode: 'USD',
+        },
+      },
+    ],
+  },
+};
+
+const sellingPlanEdgePrepaid = {
+  node: {
+    id: 'gid://shopify/SellingPlan/94',
+    billingPolicy: {
+      interval: 'MONTH',
+      intervalCount: 3,
+    },
+    deliveryPolicy: {
+      interval: 'MONTH',
+      intervalCount: 1,
+    },
+    pricingPolicies: [
+      {
+        adjustmentType: 'PERCENTAGE',
+        adjustmentValue: {
+          percentage: 10,
         },
       },
     ],
@@ -127,6 +161,10 @@ function generateSellingPlanEdge({
     node: {
       id: `gid://shopify/SellingPlan/${id}`,
       billingPolicy: {
+        interval,
+        intervalCount,
+      },
+      deliveryPolicy: {
         interval,
         intervalCount,
       },
@@ -332,6 +370,7 @@ async function mountSellingPlanDetails({
   id = '1',
   graphQLResponses = defaultGraphQLResponses as object,
   shopCurrencyCode = 'USD',
+  searchParams = '',
 } = {}) {
   mockGraphQL(graphQLResponses);
 
@@ -353,7 +392,7 @@ async function mountSellingPlanDetails({
       },
     ],
     remixStubProps: {
-      initialEntries: [`/app/plans/${id}`],
+      initialEntries: [`/app/plans/${id}${searchParams ? `?${searchParams}` : ''}`],
     },
     shopContext: {
       currencyCode: shopCurrencyCode,
@@ -381,6 +420,13 @@ describe('SellingPlanDetails', () => {
 
       expect(merchantCodeInput).toHaveValue('');
       expect(purchaseOptionTitleInput).toHaveValue('Subscribe and save');
+    });
+
+    it('preselects prepaid mode from the create query param', async () => {
+      await mountSellingPlanDetails({id: 'create', searchParams: 'mode=prepaid'});
+
+      expect(screen.getByRole('radio', {name: 'Prepaid plan'})).toBeChecked();
+      expect(screen.getByLabelText('Prepay for')).toHaveValue(3);
     });
 
     it('renders the form with the correct title and submit button text', async () => {
@@ -863,6 +909,66 @@ describe('SellingPlanDetails', () => {
         },
       );
     });
+
+    it('creates a prepaid selling plan with separate billing cadence', async () => {
+      await mountSellingPlanDetails({id: 'create', searchParams: 'mode=prepaid'});
+
+      await userEvent.type(
+        screen.getByRole('textbox', {name: 'Internal description'}),
+        'Prepaid plan',
+      );
+      await userEvent.clear(screen.getByRole('textbox', {name: 'Title'}));
+      await userEvent.type(screen.getByRole('textbox', {name: 'Title'}), 'Prepaid monthly');
+      await userEvent.selectOptions(
+        screen.getByLabelText('Delivery interval'),
+        'MONTH',
+      );
+      await userEvent.clear(screen.getByLabelText('Prepay for'));
+      await userEvent.type(screen.getByLabelText('Prepay for'), '3');
+      await userEvent.type(screen.getAllByLabelText('Percentage off')[1], '10');
+
+      await userEvent.click(screen.getByRole('button', {name: 'Save'}));
+      await waitForGraphQL();
+
+      expect(graphQL).toHavePerformedGraphQLOperation(
+        CreateSellingPlanGroupMutation,
+        {
+          variables: {
+            input: {
+              sellingPlansToCreate: [
+                {
+                  name: 'Deliver every month, prepaid for 3 deliveries, 10% off',
+                  billingPolicy: {
+                    recurring: {
+                      interval: 'MONTH',
+                      intervalCount: 3,
+                    },
+                  },
+                  deliveryPolicy: {
+                    recurring: {
+                      interval: 'MONTH',
+                      intervalCount: 1,
+                    },
+                  },
+                },
+              ],
+            },
+          },
+        },
+      );
+    });
+
+    it('returns an error when prepaid deliveries are less than 2', async () => {
+      await mountSellingPlanDetails({id: 'create', searchParams: 'mode=prepaid'});
+
+      await userEvent.clear(screen.getByLabelText('Prepay for'));
+      await userEvent.type(screen.getByLabelText('Prepay for'), '1');
+      await userEvent.click(screen.getByRole('button', {name: 'Save'}));
+
+      expect(
+        await screen.findByText('Prepaid deliveries must be at least 2'),
+      ).toBeInTheDocument();
+    });
   });
 
   describe('edit page', () => {
@@ -1116,6 +1222,125 @@ describe('SellingPlanDetails', () => {
       );
       expect(screen.getAllByLabelText('Fixed price')[1]).toHaveValue(
         sellingPlanEdgePrice.node.pricingPolicies[0].adjustmentValue.amount,
+      );
+    });
+
+    it('infers prepaid mode from existing selling plans', async () => {
+      const mockGraphQLResponses = {
+        ...defaultGraphQLResponses,
+        SellingPlanGroup: {
+          data: {
+            sellingPlanGroup: {
+              id: 'gid://shopify/SellingPlanGroup/1',
+              name: 'Subscribe 2 save',
+              merchantCode: 'The best plan',
+              sellingPlans: {
+                edges: [sellingPlanEdgePrepaid],
+              },
+              products: {
+                edges: [],
+                pageInfo: {
+                  hasNextPage: false,
+                  hasPreviousPage: false,
+                  endCursor: 'endCursor',
+                },
+              },
+              productVariants: {
+                edges: [],
+                pageInfo: {
+                  hasNextPage: false,
+                  hasPreviousPage: false,
+                  endCursor: 'endCursor',
+                },
+              },
+            },
+          },
+        },
+      };
+
+      await mountSellingPlanDetails({
+        id: '1',
+        graphQLResponses: mockGraphQLResponses,
+      });
+
+      expect(screen.getByText('Prepaid plan')).toBeInTheDocument();
+      expect(screen.getByLabelText('Prepay for')).toHaveValue(3);
+    });
+
+    it('disables saving unsupported prepaid shapes', async () => {
+      const mockGraphQLResponses = {
+        ...defaultGraphQLResponses,
+        SellingPlanGroup: {
+          data: {
+            sellingPlanGroup: {
+              id: 'gid://shopify/SellingPlanGroup/1',
+              name: 'Subscribe 2 save',
+              merchantCode: 'The best plan',
+              sellingPlans: {
+                edges: [
+                  {
+                    node: {
+                      id: 'gid://shopify/SellingPlan/95',
+                      billingPolicy: {
+                        interval: 'MONTH',
+                        intervalCount: 5,
+                      },
+                      deliveryPolicy: {
+                        interval: 'MONTH',
+                        intervalCount: 2,
+                      },
+                      pricingPolicies: [
+                        {
+                          adjustmentType: 'PERCENTAGE',
+                          adjustmentValue: {
+                            percentage: 10,
+                          },
+                        },
+                      ],
+                    },
+                  },
+                ],
+              },
+              products: {
+                edges: [],
+                pageInfo: {
+                  hasNextPage: false,
+                  hasPreviousPage: false,
+                  endCursor: 'endCursor',
+                },
+              },
+              productVariants: {
+                edges: [],
+                pageInfo: {
+                  hasNextPage: false,
+                  hasPreviousPage: false,
+                  endCursor: 'endCursor',
+                },
+              },
+            },
+          },
+        },
+      };
+
+      await mountSellingPlanDetails({
+        id: '1',
+        graphQLResponses: mockGraphQLResponses,
+      });
+
+      expect(
+        screen.getByText(
+          'This selling plan uses a prepaid configuration this editor can’t safely update yet. Review it in Shopify before making changes here.',
+        ),
+      ).toBeInTheDocument();
+
+      await userEvent.type(
+        screen.getByRole('textbox', {name: 'Internal description'}),
+        ' updated',
+      );
+
+      expect(screen.getByRole('button', {name: 'Save'})).toHaveAttribute(
+        'aria-disabled',
+        'true',
       );
     });
 

@@ -6,7 +6,7 @@ import type {
 import {json, redirect} from '@remix-run/node';
 import {useLoaderData, useSearchParams} from '@remix-run/react';
 import {composeGid, parseGid} from '@shopify/admin-graphql-api-utilities';
-import {Page} from '@shopify/polaris';
+import {Page} from '~/components/polaris';
 import {useEffect} from 'react';
 import {useTranslation} from 'react-i18next';
 import i18n from '~/i18n/i18next.server';
@@ -21,6 +21,7 @@ import {getEmptySellingPlan} from './utils';
 import {
   DiscountType,
   getSellingPlanFormSchema,
+  SellingPlanMode,
   useSellingPlanFormSchema,
 } from './validator';
 
@@ -46,10 +47,16 @@ export async function loader({
   const {admin} = await authenticate.admin(request);
   const t = await i18n.getFixedT(request, 'app.plans.details');
   const planID = params.id;
+  const url = new URL(request.url);
 
   if (planID === 'create') {
+    const sellingPlanMode =
+      url.searchParams.get('mode') === 'prepaid'
+        ? SellingPlanMode.PREPAID
+        : SellingPlanMode.RECURRING;
+
     return json({
-      sellingPlanGroup: getEmptySellingPlan(t),
+      sellingPlanGroup: getEmptySellingPlan(t, sellingPlanMode),
     });
   }
 
@@ -69,7 +76,7 @@ export async function loader({
     });
   }
 
-  const planCreated = new URL(request.url).searchParams.get('planCreated');
+  const planCreated = url.searchParams.get('planCreated');
   const createdToast = planCreated
     ? toast(t('SubscriptionPlanForm.createSuccess'))
     : undefined;
@@ -104,6 +111,7 @@ export async function action({
     removedProductIds,
     removedVariantIds,
     discountDeliveryOptions,
+    sellingPlanMode,
     sellingPlanIdsToDelete,
     offerDiscount,
     discountType,
@@ -119,6 +127,7 @@ export async function action({
         productIds: formStringToArray(selectedProductIds),
         productVariantIds: formStringToArray(selectedVariantIds),
         discountDeliveryOptions: discountDeliveryOptions || [],
+        sellingPlanMode: sellingPlanMode || SellingPlanMode.RECURRING,
         offerDiscount: Boolean(offerDiscount),
         discountType: discountType || DiscountType.PERCENTAGE,
         currencyCode: shopCurrencyCode || 'USD',
@@ -140,6 +149,24 @@ export async function action({
       {},
     );
   } else if (planID) {
+    const existingSellingPlanGroup = await getSellingPlanGroup(admin.graphql, {
+      id: composeGid('SellingPlanGroup', planID),
+      firstProducts: MAX_SELLING_PLAN_PRODUCTS,
+    });
+
+    if (!existingSellingPlanGroup) {
+      throw json({error: 'Plan not found'}, {status: 404});
+    }
+
+    if (existingSellingPlanGroup.hasUnsupportedSellingPlans) {
+      return json(
+        toast(t('SubscriptionPlanForm.unsupportedSellingPlanConfiguration'), {
+          isError: true,
+        }),
+        {status: 400},
+      );
+    }
+
     const {sellingPlanGroupId, userErrors} = await updateSellingPlanGroup(
       admin.graphql,
       {
@@ -147,6 +174,7 @@ export async function action({
         merchantCode,
         name: planName,
         discountDeliveryOptions: discountDeliveryOptions || [],
+        sellingPlanMode: existingSellingPlanGroup.sellingPlanMode,
         sellingPlansToDelete: formStringToArray(sellingPlanIdsToDelete),
         offerDiscount: Boolean(offerDiscount),
         discountType: discountType || DiscountType.PERCENTAGE,
@@ -202,6 +230,10 @@ export default function SellingPlanDetails() {
           selectedVariantIds={selectedProductVariantIds}
           sellingPlanGroupName={sellingPlanGroup.merchantCode}
           discountDeliveryOptions={discountDeliveryOptions}
+          sellingPlanMode={sellingPlanGroup.sellingPlanMode}
+          hasUnsupportedSellingPlans={Boolean(
+            sellingPlanGroup.hasUnsupportedSellingPlans,
+          )}
         />
       </Form>
     </Page>

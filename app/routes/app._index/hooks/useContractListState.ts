@@ -3,7 +3,7 @@ import {
   useSetIndexFiltersMode,
   type IndexFiltersProps,
   type TabProps,
-} from '@shopify/polaris';
+} from '~/components/polaris';
 import {useTranslation} from 'react-i18next';
 import {clearPaginationParams} from '~/utils/pagination';
 import {ContractsSortKey, SORT_ORDER_PARAM} from '../utilities';

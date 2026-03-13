@@ -1,4 +1,4 @@
-import {FooterHelp, Link} from '@shopify/polaris';
+import {FooterHelp, Link} from '~/components/polaris';
 import {useTranslation} from 'react-i18next';
 
 type FooterProps = {

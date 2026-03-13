@@ -16,8 +16,8 @@ import {
   Page,
   Text,
   useIndexResourceState,
-} from '@shopify/polaris';
-import {PlusCircleIcon} from '@shopify/polaris-icons';
+} from '~/components/polaris';
+import {PlusCircleIcon} from '~/components/polaris-icons';
 
 import type {PaginationInfo} from '~/types';
 import type {SubscriptionContractListItem} from '~/types/contracts';

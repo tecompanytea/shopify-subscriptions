@@ -189,6 +189,7 @@ export type SubscriptionContractStatusType =
 export interface SubscriptionContractListItem {
   id: string;
   customer: SubscriptionContractListItemCustomer;
+  nextBillingDate?: string | null;
   deliveryPolicy: RecurringPolicy;
   status: SubscriptionContractStatusType;
   totalPrice?: Money;

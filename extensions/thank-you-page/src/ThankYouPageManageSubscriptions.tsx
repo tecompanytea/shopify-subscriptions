@@ -2,9 +2,8 @@ import '@shopify/ui-extensions/preact';
 import {render} from 'preact';
 
 export function ThankYouPageManageSubscriptions() {
-  const shop = shopify.shop;
   const isEditor = shopify.extension.editor;
-  const defaultAccountURL = `${shop?.storefrontUrl || ''}/account`;
+  const manageSubscriptionsURL = 'extension:buyer-subscriptions/';
   const hasSubscription =
     shopify.lines?.value?.some(
       (line) => line.merchandise?.sellingPlan?.recurringDeliveries,
@@ -24,7 +23,7 @@ export function ThankYouPageManageSubscriptions() {
         <s-stack direction="block" gap="base">
           <s-heading>{translate('title')}</s-heading>
           <s-text>{translate('content')}</s-text>
-          <s-button variant="secondary" href={defaultAccountURL}>
+          <s-button variant="secondary" href={manageSubscriptionsURL}>
             {translate('manageSubscriptionLink')}
           </s-button>
         </s-stack>

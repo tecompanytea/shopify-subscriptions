@@ -22,6 +22,15 @@ query SellingPlanGroup(
               remainingBalanceChargeTrigger
             }
           }
+          deliveryPolicy {
+            ... on SellingPlanRecurringDeliveryPolicy {
+              interval
+              intervalCount
+            }
+            ... on SellingPlanFixedDeliveryPolicy {
+              fulfillmentExactTime
+            }
+          }
           pricingPolicies {
             ... on SellingPlanFixedPricingPolicy {
               adjustmentType

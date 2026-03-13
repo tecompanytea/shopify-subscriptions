@@ -8,8 +8,8 @@ import {
   InlineStack,
   Link,
   Text,
-} from '@shopify/polaris';
-import {AlertCircleIcon} from '@shopify/polaris-icons';
+} from '~/components/polaris';
+import {AlertCircleIcon} from '~/components/polaris-icons';
 import {useTranslation} from 'react-i18next';
 import type {PastBillingCycle} from '~/types';
 import {useFormatDate} from '~/utils/helpers/date';

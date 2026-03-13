@@ -4,37 +4,22 @@ import {
   Card,
   FormLayout,
   Page,
-  AppProvider as PolarisAppProvider,
   Text,
   TextField,
-} from '@shopify/polaris';
+} from '~/components/polaris';
 import {useState} from 'react';
 
 import {Form, useActionData, useLoaderData} from '@remix-run/react';
-import polarisStyles from '@shopify/polaris/build/esm/styles.css?url';
+import {AppProvider} from '@shopify/shopify-app-react-router/react';
 
-import i18nextServer from '~/i18n/i18next.server';
 import {login} from '../../shopify.server';
 import {loginErrorMessage} from './error.server';
-
-export const links = () => [{rel: 'stylesheet', href: polarisStyles}];
 
 export async function loader({request}) {
   const errors = loginErrorMessage(await login(request));
 
-  const lng = await i18nextServer.getLocale(request);
-
-  // In order for vite to know what to inject into the rollup bundle
-  // there are some rules for dynamic imports.
-  // The import must start with `./` or `../`
-  // See https://github.com/rollup/plugins/tree/master/packages/dynamic-import-vars#limitations
-  const polarisTranslations = await import(
-    `../../../node_modules/@shopify/polaris/locales/${lng}.json`
-  );
-
   return json({
     errors,
-    polarisTranslations,
   });
 }
 
@@ -51,10 +36,9 @@ export default function Auth() {
   const actionData = useActionData<typeof action>();
   const [shop, setShop] = useState('');
   const {errors} = actionData || loaderData;
-  const polarisTranslations = loaderData.polarisTranslations;
 
   return (
-    <PolarisAppProvider i18n={polarisTranslations}>
+    <AppProvider embedded={false}>
       <Page>
         <Card>
           <Form method="post">
@@ -77,6 +61,6 @@ export default function Auth() {
           </Form>
         </Card>
       </Page>
-    </PolarisAppProvider>
+    </AppProvider>
   );
 }

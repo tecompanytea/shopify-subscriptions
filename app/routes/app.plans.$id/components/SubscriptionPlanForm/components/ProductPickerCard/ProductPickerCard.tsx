@@ -12,8 +12,8 @@ import {
   Text,
   TextField,
   Thumbnail,
-} from '@shopify/polaris';
-import {ImageIcon, SearchIcon, XIcon} from '@shopify/polaris-icons';
+} from '~/components/polaris';
+import {ImageIcon, SearchIcon, XIcon} from '~/components/polaris-icons';
 import {useMemo} from 'react';
 import {useFormContext} from '@rvf/remix';
 

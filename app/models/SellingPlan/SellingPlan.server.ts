@@ -19,13 +19,15 @@ import {
   NEW_DELIVERY_OPTION_ID,
   formatSelectedProducts,
   getSellingPlansFromDiscountDeliveryOptions,
+  inferSellingPlanModeFromPolicies,
   sellingPlanInformation,
 } from '~/routes/app.plans.$id/utils';
 import type {
   DiscountDeliveryOption,
   DiscountTypeType,
+  SellingPlanModeType,
 } from '~/routes/app.plans.$id/validator';
-import {DiscountType} from '~/routes/app.plans.$id/validator';
+import {DiscountType, SellingPlanMode} from '~/routes/app.plans.$id/validator';
 import type {
   GraphQLClient,
   PaginationInfo,
@@ -122,6 +124,7 @@ interface CreateSellingPlanGroupInput {
   productIds: string[];
   productVariantIds: string[];
   discountDeliveryOptions: DiscountDeliveryOption[];
+  sellingPlanMode: SellingPlanModeType;
   discountType: DiscountTypeType;
   offerDiscount: boolean;
   currencyCode: string;
@@ -137,6 +140,7 @@ interface UpdateSellingPlanGroupVariables {
   productIdsToRemove: string[];
   productVariantIdsToAdd: string[];
   productVariantIdsToRemove: string[];
+  sellingPlanMode: SellingPlanModeType;
   discountType: DiscountTypeType;
   offerDiscount: boolean;
   currencyCode: string;
@@ -200,7 +204,12 @@ function formatSellingPlanGroup(
 ): SellingPlanGroup {
   const sellingPlans = nodesFromEdges(
     sellingPlanGroup.sellingPlans.edges || [],
-  );
+  ) as Array<{
+    id: string;
+    billingPolicy?: Partial<RecurringPolicy> | null;
+    deliveryPolicy?: Partial<RecurringPolicy> | null;
+    pricingPolicies: any[];
+  }>;
 
   const {
     products: {edges: productEdges},
@@ -228,12 +237,51 @@ function formatSellingPlanGroup(
     sellingPlans[0]?.pricingPolicies[0]?.adjustmentType ||
     DiscountType.PERCENTAGE;
 
-  const discountDeliveryOptions = sellingPlans.map((sellingPlan) => {
-    const {billingPolicy, pricingPolicies} = sellingPlan;
+  const sellingPlanModeDetails = sellingPlans.map((sellingPlan) =>
+    inferSellingPlanModeFromPolicies({
+      billingPolicy:
+        sellingPlan.billingPolicy && 'interval' in sellingPlan.billingPolicy
+          ? sellingPlan.billingPolicy
+          : null,
+      deliveryPolicy:
+        sellingPlan.deliveryPolicy && 'interval' in sellingPlan.deliveryPolicy
+          ? sellingPlan.deliveryPolicy
+          : null,
+    }),
+  );
 
-    const isRecurringPolicy = 'interval' in billingPolicy;
-    const interval = isRecurringPolicy ? billingPolicy.interval : '';
-    const intervalCount = isRecurringPolicy ? billingPolicy.intervalCount : '';
+  const supportedModes = Array.from(
+    new Set(
+      sellingPlanModeDetails
+        .filter(({isSupported}) => isSupported)
+        .map(({mode}) => mode),
+    ),
+  );
+  const hasUnsupportedSellingPlans =
+    sellingPlanModeDetails.some(({isSupported}) => !isSupported) ||
+    supportedModes.length > 1;
+  const sellingPlanMode =
+    supportedModes[0] ||
+    sellingPlanModeDetails[0]?.mode ||
+    SellingPlanMode.RECURRING;
+
+  const discountDeliveryOptions = sellingPlans.map((sellingPlan) => {
+    const {billingPolicy, deliveryPolicy, pricingPolicies} = sellingPlan;
+    const formattedDeliveryPolicy =
+      deliveryPolicy && 'interval' in deliveryPolicy
+        ? deliveryPolicy
+        : billingPolicy && 'interval' in billingPolicy
+          ? billingPolicy
+          : undefined;
+    const sellingPlanModeDetail = inferSellingPlanModeFromPolicies({
+      billingPolicy:
+        billingPolicy && 'interval' in billingPolicy ? billingPolicy : null,
+      deliveryPolicy:
+        deliveryPolicy && 'interval' in deliveryPolicy ? deliveryPolicy : null,
+    });
+
+    const interval = formattedDeliveryPolicy?.interval || '';
+    const intervalCount = formattedDeliveryPolicy?.intervalCount || '';
     const firstPricingPolicy = pricingPolicies[0];
     const hasAdjustment =
       firstPricingPolicy && 'adjustmentValue' in firstPricingPolicy;
@@ -253,6 +301,7 @@ function formatSellingPlanGroup(
       deliveryInterval: interval as DiscountDeliveryOption['deliveryInterval'],
       deliveryFrequency: intervalCount || 0,
       discountValue: discountValue,
+      prepaidDeliveriesCount: sellingPlanModeDetail.prepaidDeliveriesCount,
     };
   });
 
@@ -270,9 +319,11 @@ function formatSellingPlanGroup(
     products,
     offerDiscount: formattedOfferDiscount,
     discountType,
+    sellingPlanMode,
     discountDeliveryOptions,
     selectedProductIds,
     selectedProductVariantIds,
+    hasUnsupportedSellingPlans,
   };
 }
 
@@ -280,12 +331,15 @@ function extractSellingPlanDetails(
   graphqlSellingPlan: SellingPlanGroupListItemSellingPlan,
 ):
   | {
+      billingPolicy?: RecurringPolicy;
       deliveryPolicy: RecurringPolicy;
       discountType?: DiscountTypeType;
       discountValue?: number;
+      sellingPlanMode: SellingPlanModeType;
+      prepaidDeliveriesCount?: number;
     }
   | undefined {
-  const {deliveryPolicy, pricingPolicies} = graphqlSellingPlan;
+  const {billingPolicy, deliveryPolicy, pricingPolicies} = graphqlSellingPlan;
 
   if (!('interval' in deliveryPolicy)) return;
 
@@ -294,9 +348,19 @@ function extractSellingPlanDetails(
     pricingPolicy = pricingPolicies[0];
   }
 
+  const sellingPlanModeDetails = inferSellingPlanModeFromPolicies({
+    billingPolicy:
+      billingPolicy && 'interval' in billingPolicy ? billingPolicy : null,
+    deliveryPolicy,
+  });
+
   if (!pricingPolicy) {
     return {
+      billingPolicy:
+        billingPolicy && 'interval' in billingPolicy ? billingPolicy : undefined,
       deliveryPolicy,
+      sellingPlanMode: sellingPlanModeDetails.mode,
+      prepaidDeliveriesCount: sellingPlanModeDetails.prepaidDeliveriesCount,
     };
   }
 
@@ -307,9 +371,13 @@ function extractSellingPlanDetails(
       : pricingPolicy.adjustmentValue.amount;
 
   return {
+    billingPolicy:
+      billingPolicy && 'interval' in billingPolicy ? billingPolicy : undefined,
     discountType,
     discountValue,
     deliveryPolicy,
+    sellingPlanMode: sellingPlanModeDetails.mode,
+    prepaidDeliveriesCount: sellingPlanModeDetails.prepaidDeliveriesCount,
   };
 }
 
@@ -330,7 +398,13 @@ function buildSingleSellingPlanTranslations(
     return [];
   }
 
-  const {discountValue, deliveryPolicy, discountType} = sellingPlanDetails;
+  const {
+    discountValue,
+    deliveryPolicy,
+    discountType,
+    sellingPlanMode,
+    prepaidDeliveriesCount,
+  } = sellingPlanDetails;
   const {interval, intervalCount} = deliveryPolicy;
 
   return translationResource.translatableContent.flatMap(({key, digest}) =>
@@ -343,6 +417,8 @@ function buildSingleSellingPlanTranslations(
         currencyCode,
         interval,
         intervalCount,
+        sellingPlanMode,
+        prepaidDeliveriesCount,
       );
 
       return [
@@ -411,6 +487,7 @@ export async function createSellingPlanGroup(
     productIds,
     productVariantIds,
     discountDeliveryOptions,
+    sellingPlanMode,
     discountType,
     offerDiscount,
     currencyCode,
@@ -425,6 +502,7 @@ export async function createSellingPlanGroup(
     discountType,
     offerDiscount,
     currencyCode,
+    sellingPlanMode,
     t,
     primaryLocale,
   );
@@ -479,6 +557,7 @@ export async function updateSellingPlanGroup(
     input.discountType,
     input.offerDiscount,
     input.currencyCode,
+    input.sellingPlanMode,
     t,
     primaryLocale,
   );

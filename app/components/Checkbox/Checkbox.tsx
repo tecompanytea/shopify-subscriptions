@@ -1,16 +1,18 @@
 import {useFormContext} from '@rvf/remix';
-import {Checkbox as PolarisCheckbox} from '@shopify/polaris';
+import {Checkbox as PolarisCheckbox} from '~/components/polaris';
 
 type CheckboxProps = {
   name: string;
   label: string;
+  [key: string]: any;
 };
 
-export const Checkbox = ({name, label}: CheckboxProps) => {
+export const Checkbox = ({name, label, ...rest}: CheckboxProps) => {
   const form = useFormContext<any>();
 
   return (
     <PolarisCheckbox
+      {...rest}
       {...form.getInputProps(name, {
         id: name,
         label,

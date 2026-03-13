@@ -7,8 +7,8 @@ import {
   InlineStack,
   Link,
   Text,
-} from '@shopify/polaris';
-import {DeliveryIcon, DiscountIcon} from '@shopify/polaris-icons';
+} from '~/components/polaris';
+import {DeliveryIcon, DiscountIcon} from '~/components/polaris-icons';
 import {useTranslation} from 'react-i18next';
 import {useDeliveryFrequencyFormatter} from '~/hooks';
 import type {SubscriptionContractDetails} from '~/types/contracts';

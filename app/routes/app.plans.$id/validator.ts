@@ -11,6 +11,10 @@ const DiscountTypeEnum = z.enum(['PERCENTAGE', 'FIXED_AMOUNT', 'PRICE']);
 export const DiscountType = DiscountTypeEnum.enum;
 export type DiscountTypeType = TypeOf<typeof DiscountTypeEnum>;
 
+const SellingPlanModeEnum = z.enum(['RECURRING', 'PREPAID']);
+export const SellingPlanMode = SellingPlanModeEnum.enum;
+export type SellingPlanModeType = TypeOf<typeof SellingPlanModeEnum>;
+
 const discountDeliveryOption = (t: TFunction) =>
   z.object({
     id: z.string(),
@@ -29,6 +33,13 @@ const discountDeliveryOption = (t: TFunction) =>
       .max(Number.MAX_SAFE_INTEGER, {
         message: t('SubscriptionPlanForm.discountValueMaxError'),
       })
+      .optional(),
+    prepaidDeliveriesCount: z.coerce
+      .number()
+      .min(2, {
+        message: t('SubscriptionPlanForm.prepaidDeliveriesCountMinError'),
+      })
+      .int(t('SubscriptionPlanForm.prepaidDeliveriesCountIntegerError'))
       .optional(),
   });
 
@@ -68,12 +79,16 @@ export function getSellingPlanFormSchema(t: TFunction) {
       ),
       offerDiscount: z.string().optional(),
       discountType: DiscountTypeEnum.optional(),
+      sellingPlanMode: SellingPlanModeEnum.default(SellingPlanMode.RECURRING),
       discountDeliveryOptions: z.array(discountDeliveryOption(t)).optional(),
       sellingPlanIdsToDelete: z.string().optional(),
       shopCurrencyCode: z.string().optional(),
     })
     .superRefine(
-      ({discountType, discountDeliveryOptions}, refinementContext) => {
+      (
+        {discountType, discountDeliveryOptions, sellingPlanMode},
+        refinementContext,
+      ) => {
         // Add validation for percentage based discounts
         if (
           discountType === DiscountType.PERCENTAGE &&
@@ -112,6 +127,25 @@ export function getSellingPlanFormSchema(t: TFunction) {
                   ),
                   path: [`discountDeliveryOptions[${index}].deliveryFrequency`],
                 });
+              });
+            }
+          });
+        }
+
+        if (
+          sellingPlanMode === SellingPlanMode.PREPAID &&
+          discountDeliveryOptions?.length
+        ) {
+          discountDeliveryOptions.forEach((option, index) => {
+            if (!option.prepaidDeliveriesCount) {
+              refinementContext.addIssue({
+                code: 'custom',
+                message: t(
+                  'SubscriptionPlanForm.prepaidDeliveriesCountRequiredError',
+                ),
+                path: [
+                  `discountDeliveryOptions[${index}].prepaidDeliveriesCount`,
+                ],
               });
             }
           });

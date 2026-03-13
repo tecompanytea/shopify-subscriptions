@@ -1,0 +1,12 @@
+export const AlertCircleIcon = 'alert-circle';
+export const AlertTriangleIcon = 'alert-triangle';
+export const DeleteIcon = 'delete';
+export const DeliveryIcon = 'delivery';
+export const DiscountIcon = 'discount';
+export const EditIcon = 'edit';
+export const ImageIcon = 'image';
+export const InfoIcon = 'info';
+export const MenuHorizontalIcon = 'menu-horizontal';
+export const PlusCircleIcon = 'plus-circle';
+export const SearchIcon = 'search';
+export const XIcon = 'x';

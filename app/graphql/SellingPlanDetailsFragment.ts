@@ -2,6 +2,15 @@ export const SellingPlanDetailsFragment = `#graphql
 fragment SellingPlanDetails on SellingPlan {
   id
   name
+  billingPolicy {
+    ... on SellingPlanRecurringBillingPolicy {
+      interval
+      intervalCount
+    }
+    ... on SellingPlanFixedBillingPolicy {
+      remainingBalanceChargeTrigger
+    }
+  }
   pricingPolicies {
     ... on SellingPlanFixedPricingPolicy {
       adjustmentType

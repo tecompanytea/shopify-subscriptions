@@ -1,9 +1,5 @@
-import {AppProvider, Layout, Page, Text} from '@shopify/polaris';
-import polarisTranslations from '@shopify/polaris/locales/en.json';
-
-import polarisStyles from '@shopify/polaris/build/esm/styles.css?url';
-
-export const links = () => [{rel: 'stylesheet', href: polarisStyles}];
+import {AppProvider} from '@shopify/shopify-app-react-router/react';
+import {Layout, Page, Text} from '~/components/polaris';
 
 export async function loader() {
   return new Response(null, {status: 503});
@@ -15,7 +11,7 @@ export async function action() {
 
 export default function Maintenance() {
   return (
-    <AppProvider i18n={polarisTranslations}>
+    <AppProvider embedded={false}>
       <Page title="Scheduled maintenance">
         <Layout>
           <Layout.Section>

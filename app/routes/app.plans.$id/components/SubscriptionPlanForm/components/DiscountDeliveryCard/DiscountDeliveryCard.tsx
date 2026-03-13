@@ -1,4 +1,4 @@
-import {BlockStack, Button, Card, Text} from '@shopify/polaris';
+import {BlockStack, Button, Card, Text} from '~/components/polaris';
 import {useTranslation} from 'react-i18next';
 import {useFieldArray, useFormContext} from '@rvf/remix';
 import {v4 as uuidv4} from 'uuid';
@@ -9,8 +9,9 @@ import {
 import type {
   DiscountDeliveryOption,
   DiscountTypeType,
+  SellingPlanModeType,
 } from '~/routes/app.plans.$id/validator';
-import {DiscountType} from '~/routes/app.plans.$id/validator';
+import {DiscountType, SellingPlanMode} from '~/routes/app.plans.$id/validator';
 
 import {Checkbox} from '~/components/Checkbox';
 import {RadioButton} from '~/components/RadioButton';
@@ -19,10 +20,12 @@ import {DiscountDeliveryOptionLine} from './components/DiscountDeliveryOptionLin
 
 interface DiscountDeliveryCardProps {
   discountDeliveryOptions: DiscountDeliveryOption[];
+  sellingPlanMode?: SellingPlanModeType;
 }
 
 export function DiscountDeliveryCard({
   discountDeliveryOptions,
+  sellingPlanMode = SellingPlanMode.RECURRING,
 }: DiscountDeliveryCardProps) {
   const {t} = useTranslation('app.plans.details');
   const form = useFormContext<{
@@ -95,6 +98,7 @@ export function DiscountDeliveryCard({
               key={`${option.value('id')}_discount-delivery-option_${index}`}
               index={index}
               discountType={form.value('discountType')}
+              sellingPlanMode={sellingPlanMode}
               remove={
                 canRemoveOption
                   ? async () => await discountDeliveryOptionsField.remove(index)
@@ -110,6 +114,10 @@ export function DiscountDeliveryCard({
             onClick={async () =>
               await discountDeliveryOptionsField.push({
                 ...defaultDiscountDeliveryOption,
+                prepaidDeliveriesCount:
+                  sellingPlanMode === SellingPlanMode.PREPAID
+                    ? defaultDiscountDeliveryOption.prepaidDeliveriesCount
+                    : undefined,
                 id: `${NEW_DELIVERY_OPTION_ID}--${uuidv4()}`,
               })
             }

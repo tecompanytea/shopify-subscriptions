@@ -6,7 +6,7 @@ import {
   Grid,
   type MenuActionDescriptor,
   Page,
-} from '@shopify/polaris';
+} from '~/components/polaris';
 import {useCallback, useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import type {PastBillingCycle, UpcomingBillingCycle} from '~/types';

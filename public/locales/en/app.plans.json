@@ -2,12 +2,18 @@
   "page": {
     "title": "Subscription plans",
     "createPlan" : "Plan",
+    "createRecurringPlan": "Recurring plan",
+    "createPrepaidPlan": "Prepaid plan",
     "accessibilityLabel": "Create subscription plan"
+    ,
+    "prepaidAccessibilityLabel": "Create prepaid subscription plan"
   },
   "emptyState": {
     "title": "Get more repeat business",
     "description": "Allow customers to purchase products or services on a recurring basis",
-    "action": "Subscription plan"
+    "action": "Subscription plan",
+    "recurringAction": "Recurring plan",
+    "prepaidAction": "Prepaid plan"
   },
   "table": {
     "headings": {

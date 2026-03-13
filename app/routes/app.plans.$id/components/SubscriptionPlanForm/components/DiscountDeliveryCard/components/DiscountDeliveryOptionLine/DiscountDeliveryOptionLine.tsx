@@ -1,12 +1,15 @@
-import type {GridCellProps, GridProps} from '@shopify/polaris';
-import {BlockStack, Button, Grid, Icon, InlineStack} from '@shopify/polaris';
-import {DeleteIcon} from '@shopify/polaris-icons';
+import type {GridCellProps, GridProps} from '~/components/polaris';
+import {BlockStack, Button, Grid, Icon, InlineStack} from '~/components/polaris';
+import {DeleteIcon} from '~/components/polaris-icons';
 import type {TFunction} from 'i18next';
 import {useTranslation} from 'react-i18next';
 import {Select} from '~/components/Select';
 import {TextField} from '~/components/TextField';
-import type {DiscountTypeType} from '~/routes/app.plans.$id/validator';
-import {DiscountType} from '~/routes/app.plans.$id/validator';
+import type {
+  DiscountTypeType,
+  SellingPlanModeType,
+} from '~/routes/app.plans.$id/validator';
+import {DiscountType, SellingPlanMode} from '~/routes/app.plans.$id/validator';
 import {getSymbolFromCurrency} from '~/utils/helpers/money';
 import {DeliveryFrequencyInterval} from '~/utils/helpers/zod';
 import styles from './DiscountDeliveryOptionLine.module.css';
@@ -15,6 +18,7 @@ export interface DiscountDeliveryOptionLineProps {
   id?: string;
   index: number;
   discountType: DiscountTypeType;
+  sellingPlanMode?: SellingPlanModeType;
   offerDiscount: boolean;
   shopCurrencyCode: string;
   remove?: (index: number) => void;
@@ -24,6 +28,7 @@ export function DiscountDeliveryOptionLine({
   id,
   index,
   discountType,
+  sellingPlanMode = SellingPlanMode.RECURRING,
   offerDiscount,
   shopCurrencyCode,
   remove,
@@ -48,8 +53,13 @@ export function DiscountDeliveryOptionLine({
     },
   ];
 
-  const {columns, frequencyColumnSpan, intervalColumnSpan, discountColumnSpan} =
-    getGridProps(Boolean(offerDiscount));
+  const {
+    columns,
+    frequencyColumnSpan,
+    intervalColumnSpan,
+    prepaidColumnSpan,
+    discountColumnSpan,
+  } = getGridProps(Boolean(offerDiscount), sellingPlanMode);
 
   return (
     <>
@@ -88,7 +98,9 @@ export function DiscountDeliveryOptionLine({
                   options={deliveryIntervalOptions}
                 />
               </div>
-              {remove && !offerDiscount ? (
+              {remove &&
+              !offerDiscount &&
+              sellingPlanMode !== SellingPlanMode.PREPAID ? (
                 <div style={{paddingTop: '1.8rem'}}>
                   <Button
                     variant="plain"
@@ -100,6 +112,32 @@ export function DiscountDeliveryOptionLine({
               ) : null}
             </InlineStack>
           </Grid.Cell>
+          {sellingPlanMode === SellingPlanMode.PREPAID ? (
+            <Grid.Cell columnSpan={prepaidColumnSpan}>
+              <TextField
+                type="number"
+                min={2}
+                label={t('discountDeliveryCard.prepaidDeliveriesCount')}
+                helpText={t('discountDeliveryCard.prepaidDeliveriesCountHelpText')}
+                name={`discountDeliveryOptions[${index}].prepaidDeliveriesCount`}
+                suffix={t('discountDeliveryCard.prepaidDeliveriesCountSuffix')}
+                connectedRight={
+                  remove && !offerDiscount ? (
+                    <div style={{paddingTop: '0.25rem'}}>
+                      <Button
+                        variant="plain"
+                        accessibilityLabel={t(
+                          'discountDeliveryCard.removeOption',
+                        )}
+                        onClick={() => remove(index)}
+                        icon={<Icon source={DeleteIcon} tone="base" />}
+                      />
+                    </div>
+                  ) : null
+                }
+              />
+            </Grid.Cell>
+          ) : null}
           {offerDiscount ? (
             <Grid.Cell columnSpan={discountColumnSpan}>
               <TextField
@@ -136,20 +174,44 @@ export function DiscountDeliveryOptionLine({
   );
 }
 
-function getGridProps(offerDiscount: boolean): {
+function getGridProps(
+  offerDiscount: boolean,
+  sellingPlanMode: SellingPlanModeType,
+): {
   columns: GridProps['columns'];
   frequencyColumnSpan: GridCellProps['columnSpan'];
   intervalColumnSpan: GridCellProps['columnSpan'];
+  prepaidColumnSpan?: GridCellProps['columnSpan'];
   discountColumnSpan: GridCellProps['columnSpan'];
 } {
   const columns = {xs: 6, sm: 6, md: 6, lg: 6, xl: 6};
 
   if (offerDiscount) {
+    if (sellingPlanMode === SellingPlanMode.PREPAID) {
+      return {
+        columns,
+        frequencyColumnSpan: {xs: 3, sm: 3, md: 2, lg: 2, xl: 2},
+        intervalColumnSpan: {xs: 3, sm: 3, md: 2, lg: 2, xl: 2},
+        prepaidColumnSpan: {xs: 6, sm: 6, md: 2, lg: 2, xl: 2},
+        discountColumnSpan: {xs: 6, sm: 6, md: 6, lg: 6, xl: 6},
+      };
+    }
+
     return {
       columns,
       frequencyColumnSpan: {xs: 3, sm: 3, md: 2, lg: 2, xl: 2},
       intervalColumnSpan: {xs: 3, sm: 3, md: 2, lg: 2, xl: 2},
       discountColumnSpan: {xs: 6, sm: 6, md: 2, lg: 2, xl: 2},
+    };
+  }
+
+  if (sellingPlanMode === SellingPlanMode.PREPAID) {
+    return {
+      columns,
+      frequencyColumnSpan: {xs: 2, sm: 2, md: 2, lg: 2, xl: 2},
+      intervalColumnSpan: {xs: 2, sm: 2, md: 2, lg: 2, xl: 2},
+      prepaidColumnSpan: {xs: 2, sm: 2, md: 2, lg: 2, xl: 2},
+      discountColumnSpan: {xs: 1, sm: 1, md: 1, lg: 1, xl: 1},
     };
   }
 

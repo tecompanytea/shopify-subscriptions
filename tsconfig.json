@@ -28,7 +28,11 @@
       "~/*": ["./app/*"],
       "#/*": ["./test/*"]
     },
-    "types": ["@shopify/app-bridge-types", "vitest/globals"],
+    "types": [
+      "@shopify/app-bridge-types",
+      "@shopify/polaris-types",
+      "vitest/globals"
+    ],
     "noEmit": true,
     "skipLibCheck": true
   }

@@ -1,12 +1,11 @@
-import type {RadioButtonProps as PolarisRadioButtonProps} from '@shopify/polaris';
-import {RadioButton as PolarisRadioButton} from '@shopify/polaris';
-import type {GetInputPropsParam} from '@rvf/remix';
 import {useFormContext} from '@rvf/remix';
+import {RadioButton as PolarisRadioButton} from '~/components/polaris';
 
-type RadioButtonProps = Omit<PolarisRadioButtonProps, 'autoComplete'> & {
+type RadioButtonProps = {
   name: string;
   value: string;
   label: string;
+  [key: string]: any;
 };
 
 export const RadioButton = ({
@@ -17,7 +16,7 @@ export const RadioButton = ({
 }: RadioButtonProps) => {
   const form = useFormContext<any>();
 
-  const props: GetInputPropsParam<PolarisRadioButtonProps> = form.getInputProps(
+  const props: any = form.getInputProps(
     name,
     {
       ...rest,

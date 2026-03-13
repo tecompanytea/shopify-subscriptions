@@ -1,16 +1,21 @@
-import {List} from '@shopify/polaris';
+import {List} from '~/components/polaris';
 import {useTranslation} from 'react-i18next';
 import {useFormContext} from '@rvf/remix';
 import {useShopInfo} from '~/context/ShopContext';
 import type {
   DiscountDeliveryOption,
   DiscountTypeType,
+  SellingPlanModeType,
 } from '~/routes/app.plans.$id/validator';
-import {DiscountType} from '~/routes/app.plans.$id/validator';
+import {DiscountType, SellingPlanMode} from '~/routes/app.plans.$id/validator';
 import {formatPrice} from '~/utils/helpers/money';
 import {DeliveryFrequencyInterval} from '~/utils/helpers/zod';
 
-export function DeliverySummary() {
+export function DeliverySummary({
+  sellingPlanMode,
+}: {
+  sellingPlanMode: SellingPlanModeType;
+}) {
   const {t, i18n} = useTranslation('app.plans.details');
   const locale = i18n.language;
   const {currencyCode: shopCurrencyCode} = useShopInfo();
@@ -31,7 +36,12 @@ export function DeliverySummary() {
   }
 
   if (discountDeliveryOptions.length === 1) {
-    const {deliveryFrequency, deliveryInterval, discountValue} =
+    const {
+      deliveryFrequency,
+      deliveryInterval,
+      discountValue,
+      prepaidDeliveriesCount,
+    } =
       discountDeliveryOptions[0];
     let discountText = '';
 
@@ -50,6 +60,13 @@ export function DeliverySummary() {
       count: Number(deliveryFrequency),
       intervalCount: deliveryFrequency,
     });
+    const prepaidText =
+      sellingPlanMode === SellingPlanMode.PREPAID && prepaidDeliveriesCount
+        ? t('summaryCard.prepaidDelivery', {
+            deliveryText,
+            count: prepaidDeliveriesCount,
+          })
+        : deliveryText;
 
     if (discountValue && form.value('offerDiscount')) {
       switch (form.value('discountType')) {
@@ -83,14 +100,19 @@ export function DeliverySummary() {
 
     deliveryFrequencyText = discountText
       ? t('summaryCard.deliveryFrequenciesWithDiscount', {
-          deliveryText,
+          deliveryText: prepaidText,
           discountText,
         })
-      : deliveryText;
+      : prepaidText;
   } else {
-    deliveryFrequencyText = t('summaryCard.multipleDeliveryFrequencies', {
-      count: discountDeliveryOptions.length,
-    });
+    deliveryFrequencyText =
+      sellingPlanMode === SellingPlanMode.PREPAID
+        ? t('summaryCard.multiplePrepaidOptions', {
+            count: discountDeliveryOptions.length,
+          })
+        : t('summaryCard.multipleDeliveryFrequencies', {
+            count: discountDeliveryOptions.length,
+          });
   }
 
   return <List.Item>{deliveryFrequencyText}</List.Item>;

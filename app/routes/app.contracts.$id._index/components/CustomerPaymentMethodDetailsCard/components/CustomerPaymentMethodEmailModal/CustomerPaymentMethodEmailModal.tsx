@@ -1,7 +1,7 @@
 import type {FetcherWithComponents} from '@remix-run/react';
 import {useFetcher} from '@remix-run/react';
 import {Modal, TitleBar} from '@shopify/app-bridge-react';
-import {BlockStack, Box, Divider, InlineStack, Text} from '@shopify/polaris';
+import {BlockStack, Box, Divider, InlineStack, Text} from '~/components/polaris';
 import {useEffect} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useShopInfo} from '~/context/ShopContext';

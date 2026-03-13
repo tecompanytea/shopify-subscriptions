@@ -1,4 +1,4 @@
-import {Banner, Box, Button, InlineStack, Text} from '@shopify/polaris';
+import {Banner, Box, Button, InlineStack, Text} from '~/components/polaris';
 import {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {formatDate} from '~/utils/helpers/date';

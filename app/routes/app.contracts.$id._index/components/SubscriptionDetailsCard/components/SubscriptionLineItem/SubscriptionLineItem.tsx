@@ -9,8 +9,8 @@ import {
   Text,
   Thumbnail,
   useBreakpoints,
-} from '@shopify/polaris';
-import {AlertCircleIcon, ImageIcon} from '@shopify/polaris-icons';
+} from '~/components/polaris';
+import {AlertCircleIcon, ImageIcon} from '~/components/polaris-icons';
 import {useTranslation} from 'react-i18next';
 import type {SubscriptionContractDetailsLine} from '~/types/contracts';
 import {formatPrice} from '~/utils/helpers/money';

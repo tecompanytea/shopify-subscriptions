@@ -1,6 +1,6 @@
 import type {Logger} from 'pino';
 import {HttpResponseError} from '@shopify/shopify-api';
-import {SessionNotFoundError} from '@shopify/shopify-app-remix/server';
+import {SessionNotFoundError} from '@shopify/shopify-app-react-router/server';
 import {MaxMetaobjectDefinitionsExceededError} from '~/utils/metaobjects/MetaobjectRepository';
 import {logger} from '~/utils/logger.server';
 

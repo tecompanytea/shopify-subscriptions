@@ -1,4 +1,4 @@
-import {Box, InlineStack, Layout, Page} from '@shopify/polaris';
+import {Box, InlineStack, Layout, Page} from '~/components/polaris';
 
 import type {
   ActionFunctionArgs,

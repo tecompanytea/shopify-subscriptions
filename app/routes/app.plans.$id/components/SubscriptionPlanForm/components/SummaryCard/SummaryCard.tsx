@@ -1,9 +1,14 @@
-import {BlockStack, Card, List, Text} from '@shopify/polaris';
+import {BlockStack, Card, List, Text} from '~/components/polaris';
 import {useTranslation} from 'react-i18next';
 import {useFormContext} from '@rvf/remix';
 import {DeliverySummary, ProductSummary} from './components';
+import type {SellingPlanModeType} from '~/routes/app.plans.$id/validator';
 
-export function SummaryCard() {
+export function SummaryCard({
+  sellingPlanMode,
+}: {
+  sellingPlanMode: SellingPlanModeType;
+}) {
   const {t} = useTranslation('app.plans.details');
   const form = useFormContext<{merchantCode: string}>();
 
@@ -18,7 +23,7 @@ export function SummaryCard() {
             {form.value('merchantCode') || t('summaryCard.noPlanTitleYet')}
           </Text>
           <List type="bullet">
-            <DeliverySummary />
+            <DeliverySummary sellingPlanMode={sellingPlanMode} />
             <ProductSummary />
           </List>
         </BlockStack>

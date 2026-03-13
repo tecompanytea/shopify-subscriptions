@@ -1,4 +1,4 @@
-import '@shopify/shopify-app-remix/adapters/node';
+import '@shopify/shopify-app-react-router/adapters/node';
 
 import {createActiveBillingSchedule} from '~/models/BillingSchedule/BillingSchedule.server';
 import {logger} from '~/utils/logger.server';

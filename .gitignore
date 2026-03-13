@@ -7,6 +7,7 @@ node_modules
 /public/build/
 /app/public/build
 /prisma/data.db
+/prisma/dev.db
 /prisma/data.db-journaldatabase.sqlite
 /uploads
 /extensions/**/dist/

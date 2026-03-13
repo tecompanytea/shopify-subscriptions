@@ -39,7 +39,7 @@ import {
   TextField as PolarisTextField,
   Thumbnail,
   useBreakpoints,
-} from '@shopify/polaris';
+} from '~/components/polaris';
 import {
   DiscountIcon,
   EditIcon,
@@ -48,7 +48,7 @@ import {
   PlusCircleIcon,
   SearchIcon,
   XIcon,
-} from '@shopify/polaris-icons';
+} from '~/components/polaris-icons';
 import {createPortal} from 'react-dom';
 import type {Dispatch, RefObject, SetStateAction} from 'react';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';

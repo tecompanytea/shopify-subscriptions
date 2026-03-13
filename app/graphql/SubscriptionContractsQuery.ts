@@ -25,6 +25,7 @@ query SubscriptionContracts(
           id
           displayName
         }
+        nextBillingDate
         status
         deliveryPolicy {
           interval

@@ -1,4 +1,4 @@
-import {Image} from '@shopify/polaris';
+import {Image} from '~/components/polaris';
 import styles from './PaymentIcon.module.css';
 
 export const PAYMENT_BRANDS = {

@@ -1,4 +1,4 @@
-import {LogSeverity} from '@shopify/shopify-app-remix/server';
+import {LogSeverity} from '@shopify/shopify-app-react-router/server';
 import {default as pino} from 'pino';
 import {config} from '../../config';
 

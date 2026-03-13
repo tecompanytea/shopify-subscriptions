@@ -11,8 +11,8 @@ import {
   Thumbnail,
   Tooltip,
   useBreakpoints,
-} from '@shopify/polaris';
-import {DeleteIcon, ImageIcon, InfoIcon} from '@shopify/polaris-icons';
+} from '~/components/polaris';
+import {DeleteIcon, ImageIcon, InfoIcon} from '~/components/polaris-icons';
 import {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {TextField} from '~/components/TextField';

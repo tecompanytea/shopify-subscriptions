@@ -1,5 +1,5 @@
 import {useFormContext} from '@rvf/remix';
-import {List} from '@shopify/polaris';
+import {List} from '~/components/polaris';
 import {useTranslation} from 'react-i18next';
 import type {Product} from '~/types';
 

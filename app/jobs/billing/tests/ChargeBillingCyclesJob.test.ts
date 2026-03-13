@@ -4,7 +4,7 @@ import {TEST_SHOP} from '#/constants';
 import {afterEach, describe, expect, it, vi} from 'vitest';
 import ChargeBillingCyclesMutation from '~/graphql/ChargeBillingCyclesMutation';
 import {ChargeBillingCyclesJob} from '~/jobs/billing/ChargeBillingCyclesJob';
-import {SessionNotFoundError} from '@shopify/shopify-app-remix/server';
+import {SessionNotFoundError} from '@shopify/shopify-app-react-router/server';
 import {unauthenticated} from '~/shopify.server';
 
 function defaultGraphQLResponses() {

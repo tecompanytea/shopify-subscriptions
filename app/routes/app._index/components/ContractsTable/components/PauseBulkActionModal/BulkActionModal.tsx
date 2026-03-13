@@ -1,6 +1,6 @@
 import {useFetcher} from '@remix-run/react';
 import {Modal, TitleBar, useAppBridge} from '@shopify/app-bridge-react';
-import {Box} from '@shopify/polaris';
+import {Box} from '~/components/polaris';
 import {useEffect, useRef} from 'react';
 import {useTranslation} from 'react-i18next';
 import type {WithToast} from '~/types';

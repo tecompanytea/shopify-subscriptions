@@ -9,6 +9,12 @@
   "create": {
     "pageTitle": "Criar plano de assinatura"
   },
+  "planType": {
+    "title": "Tipo de plano",
+    "recurring": "Plano recorrente",
+    "prepaid": "Plano pré-pago",
+    "lockedHelpText": "O tipo de plano não pode ser alterado depois que este plano é criado."
+  },
   "SubscriptionPlanForm": {
     "invalidProduct": "Produto inválido selecionado",
     "invalidVariant": "Variante de produto inválida selecionada",
@@ -25,7 +31,11 @@
     "updateSuccess": "Plano de assinatura atualizado",
     "duplicateDeliveryFrequencyError": "As opções de entrega precisam ser exclusivas",
     "missingSellingPlanGroup": "Plano de assinatura não encontrado",
-    "createSuccess": "Plano de assinatura criado"
+    "createSuccess": "Plano de assinatura criado",
+    "prepaidDeliveriesCountRequiredError": "A quantidade de entregas pré-pagas é obrigatória",
+    "prepaidDeliveriesCountMinError": "A quantidade de entregas pré-pagas deve ser no mínimo 2",
+    "prepaidDeliveriesCountIntegerError": "A quantidade de entregas pré-pagas deve ser um número inteiro",
+    "unsupportedSellingPlanConfiguration": "Este plano usa uma configuração pré-paga que este editor ainda não consegue atualizar com segurança. Revise-o no Shopify antes de fazer alterações aqui."
   },
   "productCard": {
     "title": "Produtos",
@@ -50,6 +60,9 @@
       "months": "meses",
       "years": "anos"
     },
+    "prepaidDeliveriesCount": "Pré-pagar",
+    "prepaidDeliveriesCountHelpText": "Cobrar do cliente antecipadamente por esta quantidade de entregas.",
+    "prepaidDeliveriesCountSuffix": "entregas",
     "addOption": "Adicionar opção",
     "removeOption": "Remover opção",
     "discountValueFixedPriceHelpText": "Este será o preço exibido aos clientes"
@@ -80,10 +93,12 @@
       "other": "Entrega a cada {intervalCount} anos",
       "many": "Entrega a cada {intervalCount} anos"
     },
+    "prepaidDelivery": "{deliveryText}, pré-pago para {count} entregas",
     "percentageOff": "{amount}% de desconto",
     "amountOff": "Desconto de {amount}",
     "deliveryFrequenciesWithDiscount": "{deliveryText}, {discountText}",
     "multipleDeliveryFrequencies": "{count} frequências de entrega",
+    "multiplePrepaidOptions": "{count} opções pré-pagas",
     "countProducts": {
       "one": "{count} produto",
       "other": "{count} produtos",

@@ -39,6 +39,7 @@ export function createMockSubscriptionContractsQueryContract(
       id: composeGid('Customer', 1),
       displayName: 'John Doe',
     },
+    nextBillingDate: '2026-01-15T12:00:00Z',
     currencyCode: 'USD' as CurrencyCode,
     status: 'ACTIVE' as SubscriptionContractsQueryContract['status'],
     deliveryPolicy: {
@@ -74,7 +75,7 @@ export function createMockSubscriptionContractsQueryContract(
       ],
     },
     ...contract,
-  };
+  } as SubscriptionContractsQueryContract;
 }
 
 export const mockContracts = [

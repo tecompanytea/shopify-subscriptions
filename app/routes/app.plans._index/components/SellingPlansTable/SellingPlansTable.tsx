@@ -5,7 +5,7 @@ import {
   IndexTable,
   Text,
   useIndexResourceState,
-} from '@shopify/polaris';
+} from '~/components/polaris';
 
 import {parseGid} from '@shopify/admin-graphql-api-utilities';
 import {useState} from 'react';
@@ -58,31 +58,45 @@ export default function SellingPlansTable({
         sellingPlansPageInfo,
       },
       index,
-    ) => (
-      <IndexTable.Row
-        id={id}
-        key={id}
-        selected={selectedResources.includes(id)}
-        position={index}
-        accessibilityLabel={id}
-        onClick={() => navigate(`${parseGid(id)}`)}
-      >
-        <IndexTable.Cell className={`${styles.Underline} ${styles.Truncate}`}>
-          <Text variant="bodyMd" fontWeight="bold" as="span">
-            {merchantCode}
-          </Text>
-        </IndexTable.Cell>
-        <IndexTable.Cell>
-          {productCountText(products, productsCount, productVariantsCount)}
-        </IndexTable.Cell>
-        <IndexTable.Cell>
-          {sellingPlanDeliveryFrequencyText(sellingPlans, sellingPlansPageInfo)}
-        </IndexTable.Cell>
-        <IndexTable.Cell>
-          {pricingPolicyText(sellingPlans, sellingPlansPageInfo)}
-        </IndexTable.Cell>
-      </IndexTable.Row>
-    ),
+    ) => {
+      const productsLabel = productCountText(
+        products,
+        productsCount,
+        productVariantsCount,
+      );
+
+      return (
+        <IndexTable.Row
+          id={id}
+          key={id}
+          selected={selectedResources.includes(id)}
+          position={index}
+          accessibilityLabel={id}
+          onClick={() => navigate(`${parseGid(id)}`)}
+        >
+          <IndexTable.Cell>
+            <div className={`${styles.Truncate} ${styles.Underline}`} title={merchantCode}>
+              <Text variant="bodyMd" fontWeight="bold" as="span">
+                {merchantCode}
+              </Text>
+            </div>
+          </IndexTable.Cell>
+          <IndexTable.Cell>
+            <div className={styles.Truncate} title={productsLabel}>
+              <Text variant="bodyMd" as="span">
+                {productsLabel}
+              </Text>
+            </div>
+          </IndexTable.Cell>
+          <IndexTable.Cell>
+            {sellingPlanDeliveryFrequencyText(sellingPlans, sellingPlansPageInfo)}
+          </IndexTable.Cell>
+          <IndexTable.Cell>
+            {pricingPolicyText(sellingPlans, sellingPlansPageInfo)}
+          </IndexTable.Cell>
+        </IndexTable.Row>
+      );
+    },
   );
 
   return (

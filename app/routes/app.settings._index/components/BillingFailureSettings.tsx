@@ -8,7 +8,7 @@ import {
   InlineGrid,
   Link,
   Text,
-} from '@shopify/polaris';
+} from '~/components/polaris';
 import {useTranslation} from 'react-i18next';
 import {Select} from '~/components/Select';
 import {TextField} from '~/components/TextField';

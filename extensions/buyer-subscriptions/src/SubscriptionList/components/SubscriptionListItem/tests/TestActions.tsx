@@ -33,6 +33,18 @@ export async function subscriptionListSkipNextOrder() {
   await userEvent.click(confirmSkipButton);
 }
 
+export async function subscriptionListCancelContract() {
+  const cancelButton = screen.getByRole('button', {
+    name: 'Cancel',
+  });
+  await userEvent.click(cancelButton);
+
+  const confirmCancelButton = screen.getByRole('button', {
+    name: 'Cancel subscription',
+  });
+  await userEvent.click(confirmCancelButton);
+}
+
 export async function clickCloseButton() {
   const closeButton = screen.getByRole('button', {name: 'Close'});
   await userEvent.click(closeButton);

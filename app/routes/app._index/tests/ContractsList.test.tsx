@@ -109,6 +109,7 @@ describe('ContractsList', () => {
         'Product',
         'Price',
         'Delivery Frequency',
+        'Next billing',
         'Status',
       ];
 
@@ -170,11 +171,11 @@ describe('ContractsList', () => {
       const cells = screen.getAllByRole('cell');
 
       expect(cells[1]).toHaveTextContent('1');
-      expect(cells[2]).toHaveTextContent('');
-      expect(cells[3]).toHaveTextContent('John Doe');
-      expect(cells[4]).toHaveTextContent('Mexican Coffee');
-      expect(cells[5]).toHaveTextContent('$20.00');
-      expect(cells[6]).toHaveTextContent('Every month');
+      expect(cells[2]).toHaveTextContent('John Doe');
+      expect(cells[3]).toHaveTextContent('Mexican Coffee');
+      expect(cells[4]).toHaveTextContent('$20.00');
+      expect(cells[5]).toHaveTextContent('Every month');
+      expect(cells[6]).toHaveTextContent('January 15, 2026');
       expect(cells[7]).toHaveTextContent('Active');
     });
 

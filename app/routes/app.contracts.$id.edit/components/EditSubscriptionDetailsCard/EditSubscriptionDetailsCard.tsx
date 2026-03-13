@@ -9,8 +9,8 @@ import {
   TextField as PolarisTextField,
   Text,
   useBreakpoints,
-} from '@shopify/polaris';
-import {SearchIcon} from '@shopify/polaris-icons';
+} from '~/components/polaris';
+import {SearchIcon} from '~/components/polaris-icons';
 import {useFormContext} from '@rvf/remix';
 import {useTranslation} from 'react-i18next';
 import {Select} from '~/components/Select';

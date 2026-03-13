@@ -4,6 +4,7 @@ import {
   Text,
 } from '@shopify/ui-extensions-react/customer-account';
 import {
+  CancelSubscriptionModal,
   PauseSubscriptionModal,
   SkipNextOrderModal,
   ResumeSubscriptionModal,
@@ -77,6 +78,12 @@ export function SubscriptionActions({
     overlay.close(SUBSCRIPTION_ACTIONS_POPOVER_ID);
   }
 
+  function onCancelSubscription() {
+    showSuccessToast(SuccessToastType.Cancelled);
+    refetchSubscriptionListData();
+    overlay.close(SUBSCRIPTION_ACTIONS_POPOVER_ID);
+  }
+
   function skipButton() {
     return cycleIndexToSkip && resumeDateIfNextCycleSkipped ? (
       <Button
@@ -145,6 +152,18 @@ export function SubscriptionActions({
           </View>
         </Button>
       ) : null}
+      <Button
+        overlay={
+          <CancelSubscriptionModal
+            contractId={id}
+            onCancelSubscription={onCancelSubscription}
+          />
+        }
+      >
+        <View blockAlignment="center" padding="base">
+          <Text>{i18n.translate('cancel')}</Text>
+        </View>
+      </Button>
     </>
   );
 }

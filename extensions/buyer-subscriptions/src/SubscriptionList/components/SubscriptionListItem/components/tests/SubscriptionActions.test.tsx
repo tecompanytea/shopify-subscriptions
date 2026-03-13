@@ -12,6 +12,7 @@ import {
   SUBSCRIPTION_ACTIONS_POPOVER_ID,
 } from '../SubscriptionActions';
 import {
+  subscriptionListCancelContract,
   subscriptionListPauseContract,
   subscriptionListResumeContract,
   subscriptionListSkipNextOrder,
@@ -47,6 +48,7 @@ describe('<SubscriptionActions />', () => {
     expect(screen.getByText('View details')).toBeInTheDocument();
     expect(screen.getByText('Pause')).toBeInTheDocument();
     expect(screen.getByText('Skip next order')).toBeInTheDocument();
+    expect(screen.getByText('Cancel')).toBeInTheDocument();
   });
 
   it('does not render skip next order action when there is no resume date or cycle index to skip', async () => {
@@ -61,6 +63,7 @@ describe('<SubscriptionActions />', () => {
 
     expect(screen.getByText('View details')).toBeInTheDocument();
     expect(screen.getByText('Pause')).toBeInTheDocument();
+    expect(screen.getByText('Cancel')).toBeInTheDocument();
     expect(screen.queryByText('Skip next order')).not.toBeInTheDocument();
   });
 
@@ -74,6 +77,7 @@ describe('<SubscriptionActions />', () => {
 
     expect(screen.getByText('View details')).toBeInTheDocument();
     expect(screen.getByText('Resume')).toBeInTheDocument();
+    expect(screen.getByText('Cancel')).toBeInTheDocument();
   });
 
   it('renders actions for cancelled subscriptions', async () => {
@@ -195,5 +199,41 @@ describe('<SubscriptionActions />', () => {
       SUBSCRIPTION_ACTIONS_POPOVER_ID,
     );
     expect(showToastSpy).toHaveBeenCalledWith(SuccessToastType.Skipped);
+  });
+
+  it('calls refetchSubscriptionContract, showToast and ui.overlay.close when onCancelSubscription is called', async () => {
+    const refetchSpy = vi.fn();
+    const overlayCloseSpy = vi.fn();
+    const mockProps: SubscriptionActionsProps = {
+      ...defaultProps,
+      refetchSubscriptionListData: refetchSpy,
+    };
+    const showToastSpy = vi.fn();
+
+    mockShowSuccessToast(showToastSpy);
+
+    mockCustomerApiGraphQL({
+      data: {
+        subscriptionContractCancel: {
+          contract: {
+            status: 'CANCELLED',
+          },
+          userErrors: [],
+        },
+      },
+      loading: false,
+    });
+
+    mockExtensionApi({mocks: {closeOverlay: overlayCloseSpy}});
+
+    await mountWithAppContext(<SubscriptionActions {...mockProps} />);
+
+    await subscriptionListCancelContract();
+
+    expect(refetchSpy).toHaveBeenCalled();
+    expect(overlayCloseSpy).toHaveBeenCalledWith(
+      SUBSCRIPTION_ACTIONS_POPOVER_ID,
+    );
+    expect(showToastSpy).toHaveBeenCalledWith(SuccessToastType.Cancelled);
   });
 });

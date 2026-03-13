@@ -9,8 +9,8 @@ import {
   Link,
   Badge,
   Button,
-} from '@shopify/polaris';
-import {AlertCircleIcon, ImageIcon} from '@shopify/polaris-icons';
+} from '~/components/polaris';
+import {AlertCircleIcon, ImageIcon} from '~/components/polaris-icons';
 import {useTranslation} from 'react-i18next';
 import {useEffect, useState} from 'react';
 

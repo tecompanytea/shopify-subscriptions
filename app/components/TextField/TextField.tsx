@@ -1,10 +1,10 @@
-import type {TextFieldProps as PolarisTextFieldProps} from '@shopify/polaris';
-import {TextField as PolarisTextField} from '@shopify/polaris';
 import {useFormContext} from '@rvf/remix';
+import {TextField as PolarisTextField} from '~/components/polaris';
 
-type TextFieldProps = Omit<PolarisTextFieldProps, 'autoComplete'> & {
+type TextFieldProps = {
   name: string;
   label: string;
+  [key: string]: any;
 };
 
 export const TextField = ({name, label, ...rest}: TextFieldProps) => {

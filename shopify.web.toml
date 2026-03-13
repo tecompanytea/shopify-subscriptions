@@ -3,5 +3,5 @@ roles = ["frontend", "backend"]
 webhooks_path = "/webhooks/cli"
 
 [commands]
-predev = "npx dotenv -c development npm run setup"
+predev = "npx dotenv -c development npm run setup:dev"
 dev = "npx remix vite:dev"

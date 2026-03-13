@@ -1,18 +1,21 @@
-import {Button} from '@shopify/polaris';
 import {useFormContext} from '@rvf/remix';
+import {Button} from '~/components/polaris';
 
 export interface SubmitButtonProps {
-  children: React.ReactNode;
+  children: string;
+  disabled?: boolean;
 }
 
-export const SubmitButton = ({children}) => {
+export const SubmitButton = ({children, disabled = false}: SubmitButtonProps) => {
   const form = useFormContext();
 
   return (
     <Button
       submit
       variant="primary"
-      disabled={form.formState.isSubmitting || !form.formState.isDirty}
+      disabled={
+        disabled || form.formState.isSubmitting || !form.formState.isDirty
+      }
       loading={form.formState.isSubmitting}
     >
       {children}

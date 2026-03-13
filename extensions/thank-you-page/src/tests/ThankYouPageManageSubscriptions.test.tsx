@@ -53,9 +53,7 @@ describe('ThankYouPageManageSubscriptions', () => {
     const button = container.querySelector('s-button');
     expect(button?.textContent).toBe('Manage your subscription');
     expect(button?.getAttribute('variant')).toBe('secondary');
-    expect(button?.getAttribute('href')).toBe(
-      'https://test-shop.myshopify.com/account',
-    );
+    expect(button?.getAttribute('href')).toBe('extension:buyer-subscriptions/');
 
     const banner = container.querySelector('s-banner');
     expect(banner).toBeNull();
@@ -82,9 +80,7 @@ describe('ThankYouPageManageSubscriptions', () => {
     expect(button).not.toBeNull();
     expect(button?.textContent).toBe('Manage your subscription');
     expect(button?.getAttribute('variant')).toBe('secondary');
-    expect(button?.getAttribute('href')).toBe(
-      'https://test-shop.myshopify.com/account',
-    );
+    expect(button?.getAttribute('href')).toBe('extension:buyer-subscriptions/');
   });
 
   it('does not render the component when there is no subscription', async () => {
@@ -135,9 +131,7 @@ describe('ThankYouPageManageSubscriptions', () => {
     const button = container.querySelector('s-button');
     expect(button?.textContent).toBe('Manage your subscription');
     expect(button?.getAttribute('variant')).toBe('secondary');
-    expect(button?.getAttribute('href')).toBe(
-      'https://test-shop.myshopify.com/account',
-    );
+    expect(button?.getAttribute('href')).toBe('extension:buyer-subscriptions/');
 
     linesSignal.value = [];
 

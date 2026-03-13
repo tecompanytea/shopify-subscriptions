@@ -55,9 +55,5 @@ export const getSortSelectedFromParam = (param: string | null): string[] => {
 export function getSellingPlanGroupIds(
   sellingPlanGroups: SellingPlanGroupListItem[],
 ) {
-  return sellingPlanGroups.map((sellingPlanGroup) => {
-    return {
-      id: sellingPlanGroup.id,
-    };
-  });
+  return sellingPlanGroups.map((sellingPlanGroup) => sellingPlanGroup.id);
 }

@@ -1,12 +1,14 @@
-.Underline:hover {
-  text-decoration: underline;
-}
-
 .Truncate {
+  display: block;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+  min-width: 0;
   max-width: 10rem;
+}
+
+.Underline:hover {
+  text-decoration: underline;
 }
 
 @media only screen and (min-width: 500px) {

@@ -233,6 +233,25 @@ describe('Subscriptions index page', () => {
     expect(Discount?.textContent).toBe('CA$100.00-CA$300.00 off');
   });
 
+  it('renders truncation wrappers for the plan description and products cells', async () => {
+    mountComponentWithRemixStub(
+      <SellingPlansTable sellingPlanGroups={mockPlans} />,
+    );
+
+    const plan = mockPlans[2];
+    const row = document.getElementById(plan.id);
+    const columns = row?.querySelectorAll('td') || [];
+    const name = columns[1];
+    const products = columns[2];
+
+    expect(
+      name?.querySelector(`[title="${plan.merchantCode}"]`),
+    ).toBeInTheDocument();
+    expect(
+      products?.querySelector('[title="Sleek Marble Chair"]'),
+    ).toBeInTheDocument();
+  });
+
   it('navigates to the create plan page when the primary action is triggered', async () => {
     mountComponentWithRemixStub(
       <SellingPlansTable sellingPlanGroups={mockPlans} />,

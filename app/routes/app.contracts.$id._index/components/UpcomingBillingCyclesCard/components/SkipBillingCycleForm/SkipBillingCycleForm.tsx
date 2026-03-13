@@ -1,5 +1,5 @@
 import {useFetcher} from '@remix-run/react';
-import {Button} from '@shopify/polaris';
+import {Button} from '~/components/polaris';
 import {useEffect} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useToasts} from '~/hooks';
