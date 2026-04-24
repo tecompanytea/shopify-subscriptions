@@ -53,7 +53,10 @@ async function testLoader() {
     ),
   })) as any;
 
-  return await response.json();
+  // RR7 single-fetch: loaders can return plain data or DataWithResponseInit or a Response.
+  if (response && typeof response.json === 'function') return await response.json();
+  if (response && 'data' in response) return response.data;
+  return response;
 }
 
 describe('App route', () => {

@@ -1,6 +1,6 @@
 import {composeGid} from '@shopify/admin-graphql-api-utilities';
 import {describe, expect, it} from 'vitest';
-import {mockShopifyServer} from '#/test-utils';
+import {mockShopifyServer, unwrapLoaderResponse} from '#/test-utils';
 import {action} from '../route';
 import SubscriptionContractDraftCommitMutation from '~/graphql/SubscriptionContractDraftCommitMutation';
 import SubscriptionContractDraftUpdateMutation from '~/graphql/SubscriptionContractDraftUpdateMutation';
@@ -65,7 +65,7 @@ function createActionRequest(note: string) {
       id: '1',
     },
     context: {},
-  };
+  } as any;
 }
 
 describe('app.contracts.$id.note-update action', () => {
@@ -74,7 +74,7 @@ describe('app.contracts.$id.note-update action', () => {
 
     const response = await action(createActionRequest('Updated note'));
 
-    expect(response.status).toBe(200);
+    expect((await unwrapLoaderResponse(response)).status).toBe(200);
     expect(graphQL).toHavePerformedGraphQLOperation(
       SubscriptionContractDraftUpdateMutation,
       {
@@ -101,7 +101,7 @@ describe('app.contracts.$id.note-update action', () => {
 
     const response = await action(createActionRequest(''));
 
-    expect(response.status).toBe(200);
+    expect((await unwrapLoaderResponse(response)).status).toBe(200);
     expect(graphQL).toHavePerformedGraphQLOperation(
       SubscriptionContractDraftUpdateMutation,
       {

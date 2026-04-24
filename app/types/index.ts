@@ -22,10 +22,6 @@ export type GraphQLClient = Awaited<
   ReturnType<typeof authenticate.admin>
 >['admin']['graphql'];
 
-export type RestClient = Awaited<
-  ReturnType<typeof authenticate.admin>
->['admin']['rest'];
-
 export interface Money {
   amount: number;
   currencyCode: string;

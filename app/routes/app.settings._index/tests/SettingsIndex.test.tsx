@@ -1,6 +1,7 @@
 import {
   mockShopifyServer,
   mountRemixStubWithAppContext,
+  unwrapLoaderResponse,
   waitForGraphQL,
 } from '#/test-utils';
 import {screen, waitFor} from '@testing-library/react';
@@ -182,8 +183,8 @@ describe('loader', () => {
         }),
       );
 
-      const response = await loader({request, context: {}, params: {}});
-      const settings = await response.json();
+      const response = await loader({request, context: {}, params: {}} as any);
+      const {data: settings} = await unwrapLoaderResponse(response);
 
       expect(settings).toEqual({
         settings: {
@@ -214,10 +215,11 @@ describe('action', () => {
         inventoryNotificationFrequency: 'aaa',
       });
 
-      const response = await action({request, context: {}, params: {}});
+      const response = await action({request, context: {}, params: {}} as any);
+      const {status, data} = await unwrapLoaderResponse(response);
 
-      expect(response.status).toEqual(422);
-      expect(await response.json()).toEqual({
+      expect(status).toEqual(422);
+      expect(data).toEqual({
         fieldErrors: {
           retryAttempts: 'Number of retry attempts is too high',
           daysBetweenRetryAttempts:
@@ -255,8 +257,8 @@ describe('action', () => {
 
       const request = buildServerRequest();
 
-      const response = await action({request, context: {}, params: {}});
-      const settings = await response.json();
+      const response = await action({request, context: {}, params: {}} as any);
+      const {data: settings} = await unwrapLoaderResponse(response);
 
       expect(settings).toEqual({
         toast: {

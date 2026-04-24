@@ -1,5 +1,5 @@
 import {mockBulkOperations} from 'test/utils/mockBulkOperations';
-import {mockShopifyServer} from '#/test-utils';
+import {mockShopifyServer, unwrapLoaderResponse} from '#/test-utils';
 import {vi} from 'vitest';
 import {action} from '../app.contracts.bulk-operation';
 import {CustomerSendEmailJob, jobs} from '~/jobs';
@@ -44,7 +44,7 @@ describe('app.contracts.bulk-operation', () => {
       context: {},
     };
 
-    const result = await action(mockRequest);
+    const result = await action(mockRequest as any);
 
     contractIds.forEach((contractId) => {
       expect(enqueueSpy).toHaveBeenCalledWith(
@@ -59,7 +59,7 @@ describe('app.contracts.bulk-operation', () => {
       );
     });
 
-    expect(result.status).toBe(200);
+    expect((await unwrapLoaderResponse(result)).status).toBe(200);
   });
 
   it('sends customer emails for each contract after resuming successfully', async () => {
@@ -94,7 +94,7 @@ describe('app.contracts.bulk-operation', () => {
       context: {},
     };
 
-    const result = await action(mockRequest);
+    const result = await action(mockRequest as any);
 
     contractIds.forEach((contractId) => {
       expect(enqueueSpy).toHaveBeenCalledWith(
@@ -109,7 +109,7 @@ describe('app.contracts.bulk-operation', () => {
       );
     });
 
-    expect(result.status).toBe(200);
+    expect((await unwrapLoaderResponse(result)).status).toBe(200);
   });
 
   it('send customer emails for partial success', async () => {
@@ -164,9 +164,9 @@ describe('app.contracts.bulk-operation', () => {
       },
     ]);
 
-    const result = await action(mockRequest);
+    const result = await action(mockRequest as any);
 
-    expect(result.status).toBe(200);
+    expect((await unwrapLoaderResponse(result)).status).toBe(200);
 
     expect(enqueueSpy).toHaveBeenCalledTimes(2);
   });

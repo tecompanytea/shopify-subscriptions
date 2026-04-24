@@ -1,4 +1,3 @@
-import {restResources} from '@shopify/shopify-api/rest/admin/2026-01';
 import {
   ApiVersion,
   AppDistribution,
@@ -31,7 +30,6 @@ const shopify = shopifyApp({
       ? new MemorySessionStorage()
       : new PrismaSessionStorage(prisma),
   distribution: AppDistribution.AppStore,
-  restResources,
   logger: {
     log: shopifyApiLoggerFn,
     level: LogSeverity.Info,
