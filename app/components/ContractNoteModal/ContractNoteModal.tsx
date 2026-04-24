@@ -1,5 +1,5 @@
 import {Modal, TitleBar} from '@shopify/app-bridge-react';
-import {BlockStack, Box, InlineStack, Text} from '@shopify/polaris';
+import {BlockStack, Box, InlineStack, Text} from '~/components/polaris';
 
 const STextArea: any = 's-text-area';
 

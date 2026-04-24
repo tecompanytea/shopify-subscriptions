@@ -377,8 +377,10 @@ export function Thumbnail({source, alt, size, ...rest}: any) {
   return <s-thumbnail {...rest} src={source} alt={alt} size={size} />;
 }
 
-export function Image(props: any) {
-  return <img {...props} />;
+export function Image({source, ...rest}: any) {
+  // Polaris's <Image> API uses `source` but emits a regular <img src="..." />;
+  // mirror that in the wrapper so consumers (and tests) see the expected src.
+  return <img src={source} {...rest} />;
 }
 
 export function Spinner(props: any) {

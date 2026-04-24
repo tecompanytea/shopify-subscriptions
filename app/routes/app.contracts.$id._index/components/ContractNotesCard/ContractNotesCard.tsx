@@ -1,7 +1,7 @@
 import type {FetcherWithComponents} from 'react-router';
 import {useFetcher} from 'react-router';
-import {BlockStack, Button, Card, InlineStack, Text} from '@shopify/polaris';
-import {EditIcon} from '@shopify/polaris-icons';
+import {BlockStack, Button, Card, InlineStack, Text} from '~/components/polaris';
+import {EditIcon} from '~/components/polaris-icons';
 import {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {ContractNoteModal} from '~/components/ContractNoteModal/ContractNoteModal';
