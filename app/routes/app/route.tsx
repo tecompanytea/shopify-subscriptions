@@ -1,5 +1,5 @@
-import {json} from '@remix-run/node';
-import {Link, Outlet, useLoaderData, useRouteError} from '@remix-run/react';
+import {data} from 'react-router';
+import {Link, Outlet, useLoaderData, useRouteError} from 'react-router';
 import {parseGid} from '@shopify/admin-graphql-api-utilities';
 import {NavMenu} from '@shopify/app-bridge-react';
 import {boundary} from '@shopify/shopify-app-react-router/server';
@@ -33,7 +33,7 @@ export async function loader({request}) {
   const shopId = Number(parseGid(shop.id));
   const shopifyDomain = primaryDomain.url as string;
 
-  return json({
+  return data({
     apiKey: process.env.SHOPIFY_API_KEY || '',
     shopId,
     name,

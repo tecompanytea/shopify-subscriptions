@@ -1,5 +1,5 @@
 import {mountComponentWithRemixStub} from '#/test-utils';
-import {useSearchParams} from '@remix-run/react';
+import {useSearchParams} from 'react-router';
 import {screen} from '@testing-library/react';
 import type {ReactElement} from 'react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';

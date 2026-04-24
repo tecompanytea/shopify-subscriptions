@@ -5,7 +5,7 @@ import {z} from 'zod';
 import {Form} from './Form';
 import {mockShopify} from '#/setup-app-bridge';
 import {mountRemixStubWithAppContext} from '#/test-utils';
-import {json, Link, useActionData, useLoaderData} from '@remix-run/react';
+import {data,Link, useActionData, useLoaderData} from 'react-router';
 import {SubmitButton} from '../SubmitButton';
 
 const DEFAULT_VALUES = {
@@ -18,11 +18,11 @@ const mockLoaderData = vi.fn().mockReturnValue(DEFAULT_VALUES);
 const mockActionData = vi.fn().mockReturnValue(null);
 
 const loader = async () => {
-  return json(await mockLoaderData());
+  return data(await mockLoaderData());
 };
 
 const action = async () => {
-  return json(await mockActionData());
+  return data(await mockActionData());
 };
 
 function TestFormRoute() {

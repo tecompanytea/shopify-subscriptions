@@ -1,12 +1,12 @@
 import {describe, expect, it, vi, beforeEach} from 'vitest';
 import {renderHook} from '@testing-library/react';
-import {useLoaderData, useActionData} from '@remix-run/react';
+import {useLoaderData, useActionData} from 'react-router';
 import {toast} from '~/utils/toast';
 
 import {mockShopify} from '#/setup-app-bridge';
 import {useToasts} from '../useToasts';
 
-vi.mock('@remix-run/react', async (originalImport) => {
+vi.mock('react-router', async (originalImport) => {
   const original: any = await originalImport();
   return {
     ...original,

@@ -1,6 +1,6 @@
 import {useTranslation} from 'react-i18next';
-import {json, type LoaderFunctionArgs} from '@remix-run/node';
-import {Link, useLoaderData} from '@remix-run/react';
+import {data, type LoaderFunctionArgs} from 'react-router';
+import {Link, useLoaderData} from 'react-router';
 import {BlockStack, Card, Layout, List, Page, Text} from '~/components/polaris';
 import {ShopifyAppProvider} from '~/components/ShopifyAppProvider';
 
@@ -11,7 +11,7 @@ export async function loader({request}: LoaderFunctionArgs) {
   await authenticate.admin(request);
   const scopes = missingApprovedScopes();
 
-  return json({scopes});
+  return data({scopes});
 }
 
 export default function MissingScopes() {

@@ -1,4 +1,4 @@
-import {vitePlugin as remix} from '@remix-run/dev';
+import {reactRouter} from '@react-router/dev/vite';
 import {defineConfig} from 'vite';
 import type {HmrOptions, UserConfig} from 'vite';
 import tsconfigPaths from 'vite-tsconfig-paths';
@@ -46,18 +46,7 @@ export default defineConfig({
     },
   },
   plugins: [
-    remix({
-      future: {
-        unstable_optimizeDeps: true,
-        v3_relativeSplatPath: true,
-        v3_lazyRouteDiscovery: true,
-        v3_routeConfig: true,
-        v3_fetcherPersist: true,
-        v3_throwAbortReason: true,
-        v3_singleFetch: true,
-      },
-      ignoredRouteFiles: ['**/.*'],
-    }),
+    reactRouter(),
     tsconfigPaths({
       projects: [
         './tsconfig.json',
@@ -87,7 +76,7 @@ export default defineConfig({
       '@shopify/shopify-app-react-router/react',
       '@shopify/polaris-icons',
       '@shopify/address',
-      '@rvf/remix',
+      '@rvf/react-router',
       'zod',
       'uuid',
     ],

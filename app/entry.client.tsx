@@ -1,4 +1,3 @@
-import {RemixBrowser} from '@remix-run/react';
 import ShopifyFormat from '@shopify/i18next-shopify';
 import i18next from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
@@ -6,7 +5,9 @@ import Backend from 'i18next-http-backend';
 import {startTransition, StrictMode} from 'react';
 import {hydrateRoot} from 'react-dom/client';
 import {I18nextProvider, initReactI18next} from 'react-i18next';
-import {getInitialNamespaces} from 'remix-i18next/client';
+import {HydratedRouter} from 'react-router/dom';
+
+import {getInitialNamespaces} from './i18n/i18n.client';
 import i18nextOptions from './i18n/i18nextOptions';
 
 function hydrate() {
@@ -15,7 +16,7 @@ function hydrate() {
       document,
       <StrictMode>
         <I18nextProvider i18n={i18next}>
-          <RemixBrowser />
+          <HydratedRouter />
         </I18nextProvider>
       </StrictMode>,
     );

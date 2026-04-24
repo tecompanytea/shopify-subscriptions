@@ -1,4 +1,4 @@
-import {useLocation, useNavigation, useSearchParams} from '@remix-run/react';
+import {useLocation, useNavigation, useSearchParams} from 'react-router';
 import {
   useSetIndexFiltersMode,
   type IndexFiltersProps,

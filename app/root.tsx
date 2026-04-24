@@ -1,34 +1,33 @@
-import type {LoaderFunctionArgs} from '@remix-run/node';
-import {json} from '@remix-run/node';
+import {useEffect} from 'react';
+import {useTranslation} from 'react-i18next';
 import {
   Links,
+  type LoaderFunctionArgs,
   Meta,
   Outlet,
   Scripts,
   ScrollRestoration,
   useLoaderData,
   useNavigate,
-} from '@remix-run/react';
-import {useEffect} from 'react';
-import {useTranslation} from 'react-i18next';
+} from 'react-router';
 
-import remixI18n from './i18n/i18next.server';
+import {getLocale} from './i18n/i18n.server';
 
 export let handle = {
   i18n: 'common',
 };
 
 export async function loader({request}: LoaderFunctionArgs) {
-  const locale = await remixI18n.getLocale(request);
+  const locale = getLocale(request);
   const {NODE_ENV} = process.env;
 
-  return json({
+  return {
     locale,
     ENV: {
       NODE_ENV: NODE_ENV ?? 'development',
       HASH: process.env.GITHUB_SHA,
     },
-  });
+  };
 }
 
 export default function App() {

@@ -1,4 +1,4 @@
-import {type ShouldRevalidateFunction, useLoaderData} from '@remix-run/react';
+import {type ShouldRevalidateFunction, useLoaderData} from 'react-router';
 import {composeGid, parseGid} from '@shopify/admin-graphql-api-utilities';
 import {
   BlockStack,

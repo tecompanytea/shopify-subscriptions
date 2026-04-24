@@ -1,5 +1,5 @@
-import type {RemixStubProps} from '@remix-run/testing';
-import {createRemixStub} from '@remix-run/testing';
+import type {RoutesTestStubProps} from 'react-router';
+import {createRoutesStub} from 'react-router';
 import {render} from '@testing-library/react';
 import {parse} from 'graphql';
 import type {ReactElement} from 'react';
@@ -48,14 +48,14 @@ export function mountRemixStubWithAppContext({
   remixStubProps,
   shopContext,
 }: {
-  routes: Parameters<typeof createRemixStub>[0];
-  context?: Parameters<typeof createRemixStub>[1];
-  remixStubProps?: RemixStubProps;
+  routes: Parameters<typeof createRoutesStub>[0];
+  context?: Parameters<typeof createRoutesStub>[1];
+  remixStubProps?: RoutesTestStubProps;
   shopContext?: Partial<ShopContextValue>;
 }) {
-  const RemixStub = createRemixStub(routes, context);
+  const RoutesStub = createRoutesStub(routes, context);
 
-  return mountWithAppContext(<RemixStub {...remixStubProps} />, shopContext);
+  return mountWithAppContext(<RoutesStub {...remixStubProps} />, shopContext);
 }
 
 /**

@@ -8,7 +8,7 @@ import type {
 import GetShopLocales from '~/graphql/ShopLocalesQuery';
 import getTranslatableResourcesById from '~/graphql/TranslatableResourcesByIdsQuery';
 import translationsRegisterMutation from '~/graphql/TranslationsRegisterMutation';
-import i18n from '~/i18n/i18next.server';
+import i18n from '~/i18n/i18n.server';
 import i18nextOptions from '~/i18n/i18nextOptions';
 import type {GraphQLClient, ShopLocale, TranslationInput} from '~/types';
 import {logger} from '~/utils/logger.server';

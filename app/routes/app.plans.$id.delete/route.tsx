@@ -1,16 +1,14 @@
 import {
-  json,
-  redirect,
-  type TypedResponse,
-  type ActionFunctionArgs,
-} from '@remix-run/node';
+  data,redirect,
+type ActionFunctionArgs,
+} from 'react-router';
 
 import {composeGid} from '@shopify/admin-graphql-api-utilities';
-import i18n from '~/i18n/i18next.server';
+import i18n from '~/i18n/i18n.server';
 
 import {deleteSellingPlanGroup} from '~/models/SellingPlan/SellingPlan.server';
 import {authenticate} from '~/shopify.server';
-import type {WithToast} from '~/types';
+import type {TypedResponse, WithToast} from '~/types';
 import {SELLING_PLAN_DELETED_PARAM} from '~/utils/constants';
 import {toast} from '~/utils/toast';
 
@@ -37,7 +35,7 @@ export async function action({
     result.data.sellingPlanGroupDelete?.userErrors.length ||
     !result.data.sellingPlanGroupDelete?.deletedSellingPlanGroupId
   ) {
-    return json(
+    return data(
       toast(t('deleteSellingPlanGroupModal.deleteError'), {isError: true}),
     );
   }

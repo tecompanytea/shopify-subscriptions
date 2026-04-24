@@ -12,7 +12,7 @@ import {mockShopify} from '#/setup-app-bridge';
 const formErrorMock = vi.hoisted(() => vi.fn());
 const useLoaderDataMock = vi.hoisted(() => vi.fn(() => ({plan: null})));
 
-vi.mock('@remix-run/react', async (originalImport) => {
+vi.mock('react-router', async (originalImport) => {
   const original: any = await originalImport();
   return {
     ...original,
@@ -20,7 +20,7 @@ vi.mock('@remix-run/react', async (originalImport) => {
   };
 });
 
-vi.mock('@rvf/remix', async (originalImport) => {
+vi.mock('@rvf/react-router', async (originalImport) => {
   const original: any = await originalImport();
   return {
     ...original,

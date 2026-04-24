@@ -1,13 +1,11 @@
 import {
-  json,
-  type TypedResponse,
-  type ActionFunctionArgs,
-} from '@remix-run/node';
+  data, type ActionFunctionArgs,
+} from 'react-router';
 import {composeGid} from '@shopify/admin-graphql-api-utilities';
-import i18n from '~/i18n/i18next.server';
+import i18n from '~/i18n/i18n.server';
 import {buildDraftFromContract} from '~/models/SubscriptionContractDraft/SubscriptionContractDraft.server';
 import {authenticate} from '~/shopify.server';
-import type {WithToast} from '~/types';
+import type {TypedResponse, WithToast} from '~/types';
 import {toast} from '~/utils/toast';
 
 export async function action({
@@ -22,7 +20,7 @@ export async function action({
 
   const note = ((body.get('note') as string | null) || '').trim().slice(0, 5000);
 
-  const updateNoteError = json({
+  const updateNoteError = data({
     error: true,
     ...toast(
       t('notesCard.errorMessage', {
@@ -51,7 +49,7 @@ export async function action({
       return updateNoteError;
     }
 
-    return json(
+    return data(
       toast(
         t('notesCard.successMessage', {
           defaultValue: 'Note updated',

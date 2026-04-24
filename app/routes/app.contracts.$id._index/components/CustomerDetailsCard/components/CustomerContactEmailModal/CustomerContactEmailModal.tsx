@@ -1,5 +1,5 @@
-import type {FetcherWithComponents} from '@remix-run/react';
-import {useFetcher} from '@remix-run/react';
+import type {FetcherWithComponents} from 'react-router';
+import {useFetcher} from 'react-router';
 import {Modal, TitleBar} from '@shopify/app-bridge-react';
 import {BlockStack, Box, Checkbox, TextField} from '@shopify/polaris';
 import {useEffect, useState} from 'react';

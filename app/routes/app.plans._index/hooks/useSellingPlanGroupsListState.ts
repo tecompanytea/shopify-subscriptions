@@ -1,4 +1,4 @@
-import {useSearchParams} from '@remix-run/react';
+import {useSearchParams} from 'react-router';
 import {useSetIndexFiltersMode, type IndexFiltersProps} from '~/components/polaris';
 import {useTranslation} from 'react-i18next';
 import {clearPaginationParams} from '~/utils/pagination';

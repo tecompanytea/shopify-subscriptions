@@ -1,4 +1,4 @@
-import {useFetcher} from '@remix-run/react';
+import {useFetcher} from 'react-router';
 import {useEffect} from 'react';
 import {useToasts} from '~/hooks';
 import type {ResponseWithToast} from '~/types';

@@ -10,7 +10,7 @@ import {
 import {Modal, TitleBar} from '@shopify/app-bridge-react';
 import {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {useFormContext} from '@rvf/remix';
+import {useFormContext} from '@rvf/react-router';
 import {discountTextFromCycleDiscount} from '~/utils/helpers/contracts';
 import {formatPrice, getSymbolFromCurrency} from '~/utils/helpers/money';
 import {createNewPricingPolicy} from '~/utils/helpers/subscriptionLines';

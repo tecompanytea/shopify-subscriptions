@@ -1,5 +1,5 @@
-import type {FetcherWithComponents} from '@remix-run/react';
-import {useFetcher} from '@remix-run/react';
+import type {FetcherWithComponents} from 'react-router';
+import {useFetcher} from 'react-router';
 import {BlockStack, Button, Card, InlineStack, Text} from '@shopify/polaris';
 import {EditIcon} from '@shopify/polaris-icons';
 import {useEffect, useState} from 'react';

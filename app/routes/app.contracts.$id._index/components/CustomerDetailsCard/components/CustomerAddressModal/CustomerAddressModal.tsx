@@ -1,5 +1,5 @@
-import type {FetcherWithComponents} from '@remix-run/react';
-import {useFetcher} from '@remix-run/react';
+import type {FetcherWithComponents} from 'react-router';
+import {useFetcher} from 'react-router';
 import type {Address as AddressType} from '@shopify/address';
 import {parseGid} from '@shopify/admin-graphql-api-utilities';
 import {Modal, TitleBar} from '@shopify/app-bridge-react';

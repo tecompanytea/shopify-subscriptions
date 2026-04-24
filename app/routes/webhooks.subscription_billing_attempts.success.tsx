@@ -1,4 +1,4 @@
-import type {ActionFunctionArgs} from '@remix-run/node';
+import type {ActionFunctionArgs} from 'react-router';
 import {DunningStopJob, jobs, TagSubscriptionOrderJob} from '~/jobs';
 import {RECURRING_ORDER_TAGS} from '~/jobs/tags/constants';
 import {authenticate} from '~/shopify.server';

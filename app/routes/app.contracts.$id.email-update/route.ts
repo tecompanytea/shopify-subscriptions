@@ -1,12 +1,8 @@
-import {
-  json,
-  type TypedResponse,
-  type ActionFunctionArgs,
-} from '@remix-run/node';
+import {data, type ActionFunctionArgs} from 'react-router';
 import {composeGid} from '@shopify/admin-graphql-api-utilities';
-import i18n from '~/i18n/i18next.server';
+import i18n from '~/i18n/i18n.server';
 import {authenticate} from '~/shopify.server';
-import type {WithToast} from '~/types';
+import type {TypedResponse, WithToast} from '~/types';
 import {toast} from '~/utils/toast';
 import CustomerUpdateMutation from '~/graphql/CustomerUpdateMutation';
 
@@ -20,7 +16,7 @@ export async function action({
   const email = body.get('email') as string;
   const customerId = body.get('customerId') as string;
 
-  const updateEmailError = json({
+  const updateEmailError = data({
     error: true,
     ...toast(t('customerDetails.emailModal.errorMessage'), {isError: true}),
   });
@@ -39,16 +35,16 @@ export async function action({
       },
     });
 
-    const {data} = await response.json();
+    const {data: responseData} = await response.json();
 
     if (
-      !data?.customerUpdate?.customer?.id ||
-      data.customerUpdate.userErrors.length > 0
+      !responseData?.customerUpdate?.customer?.id ||
+      responseData.customerUpdate.userErrors.length > 0
     ) {
       return updateEmailError;
     }
 
-    return json(toast(t('customerDetails.emailModal.successMessage')));
+    return data(toast(t('customerDetails.emailModal.successMessage')));
   } catch {
     return updateEmailError;
   }

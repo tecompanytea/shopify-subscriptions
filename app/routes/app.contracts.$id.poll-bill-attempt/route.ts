@@ -1,8 +1,9 @@
-import {json} from '@remix-run/node';
-import type {ActionFunctionArgs, TypedResponse} from '@remix-run/node';
+import {data} from 'react-router';
+import type {ActionFunctionArgs} from 'react-router';
 import {authenticate} from '~/shopify.server';
 import SubscriptionBillingAttemptQuery from '~/graphql/SubscriptionBillingAttemptQuery';
 import {logger} from '~/utils/logger.server';
+import type {TypedResponse} from '~/types';
 
 // This code is tested in the context of where it is used on the contract details page
 // tests are available in the ContractDetails.test.tsx file
@@ -19,17 +20,17 @@ export async function action({
     },
   });
 
-  const {data} = await response.json();
-  const ready = data?.subscriptionBillingAttempt?.ready;
-  const id = data?.subscriptionBillingAttempt?.id;
+  const {data: responseData} = await response.json();
+  const ready = responseData?.subscriptionBillingAttempt?.ready;
+  const id = responseData?.subscriptionBillingAttempt?.id;
   if (!ready || !id) {
     logger.error(
       'Received invalid response from SubscriptionBillingAttemptQuery. Expected properties `subscriptionBillingAttempt.ready` and `subscriptionBillingAttempt.id`, received ',
-      {data, billingAttemptId},
+      {data: responseData, billingAttemptId},
     );
-    return json({ready: false});
+    return data({ready: false});
   }
-  return json({ready, id});
+  return data({ready, id});
 }
 
 export function shouldRevalidate() {

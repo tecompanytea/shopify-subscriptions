@@ -1,13 +1,11 @@
 import {
-  json,
-  type TypedResponse,
-  type ActionFunctionArgs,
-} from '@remix-run/node';
+  data, type ActionFunctionArgs,
+} from 'react-router';
 import {composeGid} from '@shopify/admin-graphql-api-utilities';
-import i18n from '~/i18n/i18next.server';
+import i18n from '~/i18n/i18n.server';
 import {skipOrResumeBillingCycle} from '~/services/SubscriptionBillingCycleEditService';
 import {authenticate} from '~/shopify.server';
-import type {WithToast} from '~/types';
+import type {TypedResponse, WithToast} from '~/types';
 import {SkipOrResume} from '~/utils/constants';
 import {isNonEmptyString} from '~/utils/helpers/form';
 import {toast} from '~/utils/toast';
@@ -26,7 +24,7 @@ export async function action({
   const billingCycleIndex = body.get('billingCycleIndex');
   const skip = body.get('skip');
 
-  const skipError = json(
+  const skipError = data(
     toast(t('details.nextOrders.skipError'), {isError: true}),
   );
 
@@ -50,7 +48,7 @@ export async function action({
     return skipError;
   }
 
-  return json(
+  return data(
     toast(
       skip === SkipOrResume.Skip
         ? t('details.nextOrders.skipSuccess')

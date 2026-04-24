@@ -144,7 +144,7 @@ useLoaderDataMock.mockReturnValue({plans: mockPlans, pagination: {}});
 const useNavigationMock = vi.hoisted(() => vi.fn());
 useNavigationMock.mockReturnValue({state: {}});
 
-vi.mock('@remix-run/react', async (originalImport) => {
+vi.mock('react-router', async (originalImport) => {
   const original: any = await originalImport();
   return {
     ...original,

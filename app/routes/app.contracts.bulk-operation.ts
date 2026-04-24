@@ -1,6 +1,6 @@
-import {json} from '@remix-run/node';
-import type {ActionFunctionArgs} from '@remix-run/node';
-import i18n from '~/i18n/i18next.server';
+import {data} from 'react-router';
+import type {ActionFunctionArgs} from 'react-router';
+import i18n from '~/i18n/i18n.server';
 import SubscriptionContractPause from '~/graphql/SubscriptionContractPauseMutation';
 import SubscriptionContractResume from '~/graphql/SubscriptionContractResumeMutation';
 import SubscriptionContractCancel from '~/graphql/SubscriptionContractCancelMutation';
@@ -26,7 +26,7 @@ export async function action({
   } = await authenticate.admin(request);
   const t = await i18n.getFixedT(request, 'app.contracts');
 
-  const genericBulkOperationError = json({
+  const genericBulkOperationError = data({
     toast: {
       isError: true,
       message: t('table.genericActionModal.errorToast'),
@@ -129,7 +129,7 @@ export async function action({
       sendCustomerEmails,
     );
 
-    return json({
+    return data({
       toast: {
         isError: false,
         message: t(`${translationKey}.bulkOperationStartedToast`, {
@@ -139,7 +139,7 @@ export async function action({
       bulkOperationId: response.bulkOperation.id,
     });
   } catch {
-    return json({
+    return data({
       toast: {
         isError: true,
         message: t(`${translationKey}.errorToast`, {

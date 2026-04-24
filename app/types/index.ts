@@ -1,4 +1,4 @@
-import type {TypedResponse} from '@remix-run/node';
+import type {UNSAFE_DataWithResponseInit} from 'react-router';
 import type {NodeEnv} from 'config/types';
 import type {CurrencyCode, SubscriptionBillingCycle} from 'types/admin.types';
 import type {CycleDiscountAdjustmentValue} from '~/routes/app.contracts.$id.edit/validator';
@@ -40,6 +40,11 @@ export interface Toast {
 export interface ResponseWithToast {
   toast?: Toast;
 }
+
+// RR7 actions/loaders return data directly (single-fetch). TypedResponse is a
+// thin compat alias so existing route return-type annotations keep working —
+// covers plain data, data() helper, and raw Response returns.
+export type TypedResponse<T> = T | Response | UNSAFE_DataWithResponseInit<T>;
 
 export type TypedResponseWithToast = TypedResponse<ResponseWithToast>;
 

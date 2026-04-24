@@ -15,7 +15,7 @@ import {
 } from '~/components/polaris';
 import {ImageIcon, SearchIcon, XIcon} from '~/components/polaris-icons';
 import {useMemo} from 'react';
-import {useFormContext} from '@rvf/remix';
+import {useFormContext} from '@rvf/react-router';
 
 import {useTranslation} from 'react-i18next';
 import {getSelectedResourceCount} from '~/routes/app.plans.$id/utils';

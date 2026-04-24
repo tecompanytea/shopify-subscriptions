@@ -3,17 +3,16 @@ import {Box, InlineStack, Layout, Page} from '~/components/polaris';
 import type {
   ActionFunctionArgs,
   LoaderFunctionArgs,
-  TypedResponse,
-} from '@remix-run/node';
-import {json} from '@remix-run/node';
-import {useLoaderData} from '@remix-run/react';
+} from 'react-router';
+import {data} from 'react-router';
+import {useLoaderData} from 'react-router';
 import {useTranslation} from 'react-i18next';
-import type {ValidationErrorResponseData} from '@rvf/remix';
-import {validationError} from '@rvf/remix';
+import type {ValidationErrorResponseData} from '@rvf/react-router';
+import {validationError} from '@rvf/react-router';
 import {Form} from '~/components/Form';
 import {SubmitButton} from '~/components/SubmitButton';
-import i18n from '~/i18n/i18next.server';
-import type {WithToast} from '~/types';
+import i18n from '~/i18n/i18n.server';
+import type {TypedResponse, WithToast} from '~/types';
 import {
   loadSettingsMetaobject,
   updateSettingsMetaobject,
@@ -36,7 +35,7 @@ export const loader = async ({request}: LoaderFunctionArgs) => {
   const {admin} = await authenticate.admin(request);
 
   const settings = await loadSettingsMetaobject(admin.graphql);
-  return json({settings});
+  return data({settings});
 };
 
 export async function action({
@@ -62,10 +61,10 @@ export async function action({
   );
 
   if (!success) {
-    return json(toast(t('actions.updateFailed'), {isError: true}));
+    return data(toast(t('actions.updateFailed'), {isError: true}));
   }
 
-  return json(toast(t('actions.updateSuccess')));
+  return data(toast(t('actions.updateSuccess')));
 }
 
 export default function SettingsIndex() {

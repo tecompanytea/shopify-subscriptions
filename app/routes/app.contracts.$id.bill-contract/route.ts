@@ -1,11 +1,11 @@
-import {json} from '@remix-run/node';
-import type {ActionFunctionArgs, TypedResponse} from '@remix-run/node';
+import {data} from 'react-router';
+import type {ActionFunctionArgs} from 'react-router';
 import {composeGid} from '@shopify/admin-graphql-api-utilities';
 import {authenticate} from '~/shopify.server';
-import type {WithToast} from '~/types';
+import type {TypedResponse, WithToast} from '~/types';
 import {toast} from '~/utils/toast';
 import SubscriptionBillingCycleChargeIndexMutation from '~/graphql/SubscriptionBillingCycleChargeIndexMutation';
-import i18n from '~/i18n/i18next.server';
+import i18n from '~/i18n/i18n.server';
 import {logger} from '~/utils/logger.server';
 import type {SubscriptionBillingAttemptInventoryPolicy} from '../../../types/admin.types';
 
@@ -24,7 +24,7 @@ export async function action({
   const cycleIndex = body.get('cycleIndex');
   if (!cycleIndex) {
     logger.error('missing cycleIndex in request body', {body});
-    return json(toast(t('actions.billContract.error'), {isError: true}));
+    return data(toast(t('actions.billContract.error'), {isError: true}));
   }
 
   const response = await admin.graphql(
@@ -39,18 +39,18 @@ export async function action({
     },
   );
 
-  const {data} = await response.json();
+  const {data: responseData} = await response.json();
   let billingAttempt =
-    data?.subscriptionBillingCycleCharge?.subscriptionBillingAttempt;
+    responseData?.subscriptionBillingCycleCharge?.subscriptionBillingAttempt;
   if (!billingAttempt) {
     logger.error(
       'Received invalid response from SubscriptionBillingCycleChargeIndex mutation. Expected property `subscriptionBillingCycleCharge.subscriptionBillingAttempt`, received ',
-      {data, contractId},
+      {data: responseData, contractId},
     );
-    return json(toast(t('actions.billContract.error'), {isError: true}));
+    return data(toast(t('actions.billContract.error'), {isError: true}));
   }
   const id = billingAttempt.id;
-  return json({
+  return data({
     id,
     ...toast(t('actions.billContract.success')),
   });

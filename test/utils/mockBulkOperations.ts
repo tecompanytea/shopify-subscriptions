@@ -1,4 +1,4 @@
-import type {NodeOnDiskFile} from '@remix-run/node';
+import type {NodeOnDiskFile} from 'react-router';
 import {vi} from 'vitest';
 import type {GraphQLClient} from '~/types';
 import type {BulkMutationResult} from '~/utils/bulkOperations';

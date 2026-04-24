@@ -9,7 +9,7 @@ import {
 } from '~/components/polaris';
 import {useTranslation} from 'react-i18next';
 
-import {Link} from '@remix-run/react';
+import {Link} from 'react-router';
 import {SubscriptionContractStatus} from '~/types';
 import type {
   FailedBillingCycle,

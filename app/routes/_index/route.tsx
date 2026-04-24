@@ -1,6 +1,6 @@
-import {json, redirect} from '@remix-run/node';
-import type {MetaFunction} from '@remix-run/react';
-import {Form, useLoaderData} from '@remix-run/react';
+import {data,redirect} from 'react-router';
+import type {MetaFunction} from 'react-router';
+import {Form, useLoaderData} from 'react-router';
 import {
   BlockStack,
   Button,
@@ -23,7 +23,7 @@ export async function loader({request}) {
     throw redirect(`/app?${url.searchParams.toString()}`);
   }
 
-  return json({
+  return data({
     showForm: Boolean(login),
   });
 }

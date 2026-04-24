@@ -1,16 +1,15 @@
 import {
-  json,
-  redirect,
+  data,redirect,
   type ActionFunctionArgs,
   type LoaderFunctionArgs,
-} from '@remix-run/node';
+} from 'react-router';
 import {
   Form as RemixForm,
   useActionData,
   useFetcher,
   useLoaderData,
   useNavigation,
-} from '@remix-run/react';
+} from 'react-router';
 import {parseGid} from '@shopify/admin-graphql-api-utilities';
 import {
   ActionList,
@@ -320,7 +319,7 @@ export async function loader({request}: LoaderFunctionArgs) {
       'Unable to load customers right now. Customer selector may be incomplete.';
   }
 
-  return json<LoaderData>({
+  return data<LoaderData>({
     customers,
     customerLoadWarning,
   });
@@ -332,18 +331,18 @@ export async function action({request}: ActionFunctionArgs) {
   const intent = formData.get('intent');
 
   if (intent === 'search_customers') {
-    return json(await searchCustomers(admin, formData));
+    return data(await searchCustomers(admin, formData));
   }
 
   if (intent === 'create_customer') {
-    return json(await createCustomer(admin, formData));
+    return data(await createCustomer(admin, formData));
   }
 
   if (intent === 'create_contract') {
     const result = await createSubscriptionContract(admin, formData);
 
     if ('error' in result) {
-      return json<CreateContractActionData>(
+      return data<CreateContractActionData>(
         {
           type: 'create_contract_error',
           error: result.error,
@@ -355,7 +354,7 @@ export async function action({request}: ActionFunctionArgs) {
     return redirect(`/app/contracts/${safeParseGid(result.contractId)}`);
   }
 
-  return json<CustomerActionData>(
+  return data<CustomerActionData>(
     {
       type: 'error',
       error: 'Unknown action intent.',
