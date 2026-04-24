@@ -16,12 +16,27 @@ export default defineConfig({
     }),
     graphql(),
   ],
+  // Force a single module identity for react-router so its internal contexts
+  // (DataRouterStateContext, DataRouterContext, etc.) aren't duplicated
+  // across ESM and CJS chunks — duplication breaks hooks like useActionData
+  // when a consumer (e.g. @rvf/react-router) and the RouterProvider resolve
+  // to different chunks. Pin the resolve condition to `module` so every
+  // import lands on index.mjs rather than flip-flopping between .mjs/.js.
+  resolve: {
+    conditions: ['module', 'browser', 'development', 'default'],
+    dedupe: ['react', 'react-dom', 'react-router', '@rvf/react', '@rvf/react-router'],
+  },
   server: {
     watch: {
       ignored: ['.*\\/node_modules\\/.*', '.*\\/build\\/.*'],
     },
   },
   test: {
+    server: {
+      deps: {
+        inline: ['react-router', '@rvf/react', '@rvf/react-router'],
+      },
+    },
     globals: true,
     environment: 'happy-dom',
     // By default vitest v2 uses 'forks' but that fails in CI, possibly because of how our VMs are set up
