@@ -430,7 +430,7 @@ export function Text({
 
   if (String(as).startsWith('h') || String(variant).startsWith('heading')) {
     return (
-      <s-heading {...rest} style={textStyle}>
+      <s-heading role="heading" aria-level={1} {...rest} style={textStyle}>
         {children}
       </s-heading>
     );
