@@ -22,6 +22,7 @@ import {
   deliveryMethodIsShipping,
 } from '~/utils/typeGuards/contracts';
 import {CustomerAddressModal} from './components/CustomerAddressModal/CustomerAddressModal';
+import {CustomerContactEmailModal} from './components/CustomerContactEmailModal/CustomerContactEmailModal';
 
 export interface CustomerDetailsCardProps {
   customer: Customer;
@@ -35,6 +36,7 @@ export function CustomerDetailsCard({
   const {t} = useTranslation('app.contracts');
   const [menuOpen, setMenuOpen] = useState(false);
   const [addressModalOpen, setAddressModalOpen] = useState(false);
+  const [emailModalOpen, setEmailModalOpen] = useState(false);
 
   const {id, displayName, email, addresses} = customer;
 
@@ -78,9 +80,16 @@ export function CustomerDetailsCard({
         </BlockStack>
         {email ? (
           <BlockStack gap="200">
-            <Text as="h2" variant="headingMd" fontWeight="semibold">
-              {t('customerDetails.contactInformation')}
-            </Text>
+            <InlineStack align="space-between">
+              <Text as="h2" variant="headingMd" fontWeight="semibold">
+                {t('customerDetails.contactInformation')}
+              </Text>
+              <Button
+                variant="plain"
+                icon={EditIcon}
+                onClick={() => setEmailModalOpen(true)}
+              />
+            </InlineStack>
             <Link
               removeUnderline
               target="_parent"
@@ -90,6 +99,12 @@ export function CustomerDetailsCard({
                 {email}
               </Text>
             </Link>
+            <CustomerContactEmailModal
+              open={emailModalOpen}
+              onClose={() => setEmailModalOpen(false)}
+              customerEmail={email}
+              customerId={id}
+            />
           </BlockStack>
         ) : null}
         {formattedAddress ? (

@@ -131,6 +131,10 @@ export class SubscriptionContractDraft {
     return isDraftContractUpdated;
   }
 
+  public async updateNote(note: string | null) {
+    return this.update({note});
+  }
+
   public async removeLine(lineId: string): Promise<boolean> {
     const response = await this.graphql(
       SubscriptionContractDraftRemoveLineMutation,

@@ -1,19 +1,15 @@
-import {parseGid} from '@shopify/admin-graphql-api-utilities';
 import {
-  ActionList,
   BlockStack,
   Button,
   Card,
   InlineStack,
-  Popover,
   Text,
 } from '~/components/polaris';
 import {EditIcon} from '~/components/polaris-icons';
-import {useCallback, useState} from 'react';
+import {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import PaymentIcon from '~/components/PaymentIcon/PaymentIcon';
 import type {Customer, CustomerPaymentMethod} from '~/types/contracts';
-import {getMobileSafeProtocolURL} from '~/utils/getMobileSafeProtocolURL';
 import {
   formatExpirationDate,
   formatPaymentBrandName,
@@ -36,15 +32,9 @@ export function CustomerPaymentMethodDetailsCard({
 }: CustomerPaymentMethodDetailsCardProps) {
   const {t, i18n} = useTranslation('app.contracts');
   const formatDate = useFormatDate();
-  const [menuOpen, setMenuOpen] = useState(false);
   const [emailModalOpen, setEmailModalOpen] = useState(false);
 
   const {instrument} = customerPaymentMethod;
-
-  const toggleEditMenu = useCallback(
-    () => setMenuOpen((active) => !active),
-    [],
-  );
 
   if (!instrument) {
     return null;
@@ -96,45 +86,11 @@ export function CustomerPaymentMethodDetailsCard({
                 <Text as="h2" variant="headingMd" fontWeight="semibold">
                   {t('paymentMethodDetails.title')}
                 </Text>
-                <Popover
-                  active={menuOpen}
-                  activator={
-                    <Button
-                      variant="plain"
-                      icon={EditIcon}
-                      onClick={toggleEditMenu}
-                    />
-                  }
-                  autofocusTarget="first-node"
-                  onClose={toggleEditMenu}
-                >
-                  <ActionList
-                    actionRole="menuitem"
-                    items={[
-                      {
-                        content: t(
-                          'paymentMethodDetails.actions.sendUpdateLink',
-                        ),
-                        onAction: () => {
-                          setEmailModalOpen(true);
-                        },
-                      },
-                      {
-                        content: t(
-                          'paymentMethodDetails.actions.managePayment',
-                        ),
-                        onAction: () => {
-                          open(
-                            getMobileSafeProtocolURL(
-                              `shopify:admin/customers/${parseGid(customer.id)}`,
-                            ),
-                            '_top',
-                          );
-                        },
-                      },
-                    ]}
-                  />
-                </Popover>
+                <Button
+                  variant="plain"
+                  icon={EditIcon}
+                  onClick={() => setEmailModalOpen(true)}
+                />
               </InlineStack>
               <BlockStack gap="200">
                 <InlineStack gap="200" blockAlign="center">

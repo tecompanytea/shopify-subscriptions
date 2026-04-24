@@ -12,7 +12,6 @@ import {
   useNavigation,
 } from '@remix-run/react';
 import {parseGid} from '@shopify/admin-graphql-api-utilities';
-import {Modal, TitleBar} from '@shopify/app-bridge-react';
 import {
   ActionList,
   Banner,
@@ -54,11 +53,12 @@ import type {Dispatch, RefObject, SetStateAction} from 'react';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {PaymentSummaryCard} from '~/components/PaymentSummaryCard/PaymentSummaryCard';
 import PaymentIcon from '~/components/PaymentIcon/PaymentIcon';
+import {ContractNoteModal} from '~/components/ContractNoteModal/ContractNoteModal';
 import SubscriptionContractAtomicCreateMutation from '~/graphql/SubscriptionContractAtomicCreateMutation';
 import {useTranslation} from 'react-i18next';
 import {authenticate} from '~/shopify.server';
+import {getResourcePickerSelectionImage} from '~/utils/helpers/resourcePicker';
 
-const STextArea: any = 's-text-area';
 const SDateField: any = 's-date-field';
 
 type CustomerAddress = {
@@ -517,22 +517,7 @@ export default function CreateManualSubscriptionPage() {
       if ('variants' in item) {
         item.variants.forEach((variant: any) => {
           if (variant.id && !currentVariantIds.has(variant.id)) {
-            const variantImage = variant.image
-              ? {
-                  url: variant.image.originalSrc,
-                  alt: variant.image.altText ?? '',
-                }
-              : null;
-            const fallbackImage = item.images?.[0]
-              ? {
-                  url: item.images[0].originalSrc,
-                  alt: item.images[0].altText ?? '',
-                }
-              : null;
-            const image =
-              item.totalVariants > 1
-                ? variantImage
-                : (fallbackImage ?? variantImage);
+            const image = getResourcePickerSelectionImage(item, variant);
 
             newProducts.push({
               id: `${item.id}-${variant.id}`,
@@ -544,7 +529,7 @@ export default function CreateManualSubscriptionPage() {
               price: Number(variant.price ?? '0.00'),
               currencyCode: 'USD',
               imageUrl: image?.url,
-              imageAlt: image?.alt,
+              imageAlt: image?.altText,
             });
           }
         });
@@ -940,11 +925,7 @@ export default function CreateManualSubscriptionPage() {
   };
 
   const saveNote = () => {
-    if (noteDraftText.trim() === '') {
-      return;
-    }
-
-    setNote(noteDraftText);
+    setNote(noteDraftText.trim() === '' ? null : noteDraftText);
     setIsNoteModalOpen(false);
   };
 
@@ -2086,51 +2067,29 @@ export default function CreateManualSubscriptionPage() {
         )}
       </PolarisModal>
 
-      <Modal open={isNoteModalOpen} onHide={closeNoteModal}>
-        <Box padding="300">
-          <BlockStack gap="300">
-            <BlockStack gap="100">
-              <STextArea
-                label={t('manualCreate.notes.label', {
-                  defaultValue: 'Notes',
-                })}
-                rows={6}
-                details={t('manualCreate.notes.helper', {
-                  defaultValue:
-                    'To comment on a draft order or mention a staff member, use Timeline instead',
-                })}
-                placeholder={t('manualCreate.notes.placeholder', {
-                  defaultValue: 'Add note',
-                })}
-                autocomplete="off"
-                value={noteDraftText}
-                onInput={(event: any) =>
-                  setNoteDraftText(
-                    String(event?.currentTarget?.value ?? '').slice(0, 5000),
-                  )
-                }
-              />
-              <InlineStack align="end">
-                <Text as="p" variant="bodySm" tone="subdued">
-                  {`${noteDraftText.length}/5000`}
-                </Text>
-              </InlineStack>
-            </BlockStack>
-          </BlockStack>
-        </Box>
-        <TitleBar
-          title={t('manualCreate.notes.modalTitle', {
-            defaultValue: 'Add note',
-          })}
-        >
-          <button onClick={closeNoteModal}>
-            {t('manualCreate.notes.cancel', {defaultValue: 'Cancel'})}
-          </button>
-          <button disabled={noteDraftText.trim() === ''} onClick={saveNote}>
-            {t('manualCreate.notes.done', {defaultValue: 'Done'})}
-          </button>
-        </TitleBar>
-      </Modal>
+      <ContractNoteModal
+        open={isNoteModalOpen}
+        initialValue={note}
+        value={noteDraftText}
+        onValueChange={setNoteDraftText}
+        onClose={closeNoteModal}
+        onSave={saveNote}
+        title={t('manualCreate.notes.modalTitle', {
+          defaultValue: 'Add note',
+        })}
+        label={t('manualCreate.notes.label', {
+          defaultValue: 'Notes',
+        })}
+        details={t('manualCreate.notes.helper', {
+          defaultValue:
+            'To comment on a draft order or mention a staff member, use Timeline instead',
+        })}
+        placeholder={t('manualCreate.notes.placeholder', {
+          defaultValue: 'Add note',
+        })}
+        cancelText={t('manualCreate.notes.cancel', {defaultValue: 'Cancel'})}
+        doneText={t('manualCreate.notes.done', {defaultValue: 'Done'})}
+      />
     </Page>
   );
 }

@@ -1,0 +1,16 @@
+const CustomerUpdateMutation = `#graphql
+mutation CustomerUpdate($input: CustomerInput!) {
+  customerUpdate(input: $input) {
+    customer {
+      id
+      email
+    }
+    userErrors {
+      field
+      message
+    }
+  }
+}
+`;
+
+export default CustomerUpdateMutation;

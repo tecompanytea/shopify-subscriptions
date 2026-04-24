@@ -3,6 +3,7 @@ query SubscriptionContractDetails($id: ID!) {
   subscriptionContract(id: $id) {
     id
     status
+    note
     currencyCode    lines(first: 50) {
       edges {
         node {

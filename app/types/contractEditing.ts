@@ -65,6 +65,7 @@ export interface SubscriptionDraftUpdateInput {
   deliveryPolicy?: RecurringPolicy;
   billingPolicy?: RecurringPolicy;
   deliveryMethod?: DeliveryMethod;
+  note?: string | null;
 }
 
 export interface SubscriptionContractDraftDiscount {

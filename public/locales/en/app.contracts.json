@@ -265,6 +265,17 @@
       "selectAddress": "Select a different address",
       "manageAddress": "Manage addresses on customer page"
     },
+    "emailModal": {
+      "title": "Edit contact information",
+      "emailLabel": "Email",
+      "updateProfile": "Update customer profile",
+      "errorMessage": "Unable to update email",
+      "successMessage": "Email updated",
+      "actions": {
+        "cancel": "Cancel",
+        "done": "Done"
+      }
+    },
     "addressModal": {
       "title": "Select a different address",
       "actions": {

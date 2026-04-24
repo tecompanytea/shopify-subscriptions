@@ -72,7 +72,6 @@ export default function App() {
           href="https://cdn.shopify.com/static/fonts/inter/v4/styles.css"
         />
         <meta name="shopify-experimental-features" content="keepAlive" />
-        <script src="https://cdn.shopify.com/shopifycloud/polaris.js"></script>
         <Meta />
         <Links />
       </head>
@@ -84,6 +83,10 @@ export default function App() {
             __html: `window.ENV = ${JSON.stringify(ENV)}`,
           }}
         />
+        <script
+          defer
+          src="https://cdn.shopify.com/shopifycloud/polaris.js"
+        ></script>
         <Scripts />
       </body>
     </html>
