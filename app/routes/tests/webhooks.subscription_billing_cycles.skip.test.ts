@@ -27,7 +27,7 @@ describe('when webhook action is triggered', () => {
         cycle_index: 1,
       },
     });
-    await action(ACTION_REQUEST);
+    await action(ACTION_REQUEST as any);
 
     expect(enqueueSpy).toHaveBeenCalledWith(
       new CustomerSendEmailJob({

@@ -6,6 +6,7 @@ import type {
   SubscriptionDraftLineUpdateMutation as SubscriptionDraftLineUpdateMutationData,
   SubscriptionDraftUpdateMutation as SubscriptionDraftUpdateMutationData,
 } from 'types/admin.generated';
+import type {SubscriptionContractDraftDiscountsQuery as SubscriptionContractDraftDiscountsQueryType} from 'types/admin.generated';
 import type {CountryCode} from 'types/admin.types';
 import SubscriptionContractDraftAddLineMutation from '~/graphql/SubscriptionContractDraftAddLineMutation';
 import SubscriptionContractDraftCommitMutation from '~/graphql/SubscriptionContractDraftCommitMutation';
@@ -271,7 +272,9 @@ export class SubscriptionContractDraft {
       },
     );
 
-    const {data} = await response.json();
+    const {data} = (await response.json()) as {
+      data?: SubscriptionContractDraftDiscountsQueryType;
+    };
 
     if (!data || !data.subscriptionDraft) {
       logger.warn(

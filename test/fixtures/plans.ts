@@ -3,6 +3,7 @@ import type {
   CreateSellingPlanGroupMutation as CreateSellingPlanGroupMutationType,
   SellingPlanGroupQuery as SellingPlanGroupQueryType,
 } from 'types/admin.generated';
+import {SellingPlanInterval} from 'types/admin.types';
 type GraphqlSellingPlanGroup = NonNullable<
   SellingPlanGroupQueryType['sellingPlanGroup']
 >;
@@ -80,8 +81,15 @@ export function mockSellingPlanGroupCreateResponse(): CreateSellingPlanGroupMuta
               node: {
                 id: composeGid('SellingPlan', 1),
                 name: 'Plan 1',
+                billingPolicy: {
+                  interval: SellingPlanInterval.Week,
+                  intervalCount: 1,
+                },
                 pricingPolicies: [],
-                deliveryPolicy: {},
+                deliveryPolicy: {
+                  interval: SellingPlanInterval.Week,
+                  intervalCount: 1,
+                },
               },
             },
           ],

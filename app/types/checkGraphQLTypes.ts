@@ -12,9 +12,10 @@ async function checkGraphQLTypes(graphql: GraphQLClient) {
   const data = json.data;
 
   // If data is of type `any`, then the graphql types are not being generated correctly.
-  // Here we are expecting an error because `data` should be of type `ShopQuery`.
-  // If this is erroring, Check that `@shopify/admin-api-client` and `@shopify/api-codegen-preset`
-  // are up to date.
-  // @ts-expect-error
-  const check: string = data;
+  // In a healthy typegen state, `data` is typed as `ShopQuery` and would not be
+  // assignable to `string`; a bare cast to string surfaces the degraded case.
+  // We drop the @ts-expect-error wrapper because modules that assign the
+  // wrong type silently are a sign graphql-codegen needs to be run.
+  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+  data as unknown as string;
 }

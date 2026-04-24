@@ -5,6 +5,7 @@
     "test/**/*",
     "extensions/**/*",
     "config/**/*",
+    "types/**/*",
     "type-definitions/global.d.ts",
     "type-definitions/index.d.ts",
     ".react-router/types/**/*"

@@ -26,7 +26,7 @@ describe('customer account emails route', () => {
         params: {},
         context: {},
       };
-      const response = await action(mockRequest);
+      const response = await action(mockRequest as any);
 
       expect(response.status).toBe(200);
       expect(enqueueSpy).toHaveBeenCalledWith(
@@ -63,7 +63,7 @@ describe('customer account emails route', () => {
       context: {},
     };
 
-    const response = await action(mockRequest);
+    const response = await action(mockRequest as any);
 
     expect(response.status).toBe(500);
   });

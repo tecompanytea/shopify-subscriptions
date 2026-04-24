@@ -865,7 +865,7 @@ export function Grid({children, columns, gap, alignItems}: GridProps) {
 
   return (
     <s-grid
-      gap={mapSpacing(pickResponsiveValue(gap, width) as string)}
+      gap={mapSpacing(pickResponsiveValue(gap, width) as string) as any}
       alignItems={
         alignItems === 'start' || alignItems === 'end' || alignItems === 'center'
           ? alignItems

@@ -39,7 +39,7 @@ describe('when webhook action is triggered', () => {
           topic: 'SUBSCRIPTION_CONTRACTS_CREATE',
           payload: subscriptionContractPayload,
         });
-        await action(ACTION_REQUEST);
+        await action(ACTION_REQUEST as any);
 
         expect(enqueueSpy).toHaveBeenCalledWith(
           new CustomerSendEmailJob({
@@ -70,7 +70,7 @@ describe('when webhook action is triggered', () => {
           topic: 'SUBSCRIPTION_CONTRACTS_CREATE',
           payload: subscriptionContractPayloadNullOrder,
         });
-        await action(ACTION_REQUEST);
+        await action(ACTION_REQUEST as any);
 
         expect(enqueueSpy).toHaveBeenCalledOnce();
         expect(enqueueSpy).toHaveBeenCalledWith(

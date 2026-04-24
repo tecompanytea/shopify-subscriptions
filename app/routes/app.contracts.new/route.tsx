@@ -311,7 +311,7 @@ export async function loader({request}: LoaderFunctionArgs) {
       for (const edge of result.data?.customers?.edges ?? []) {
         const node = edge.node;
         if (!node?.id) continue;
-        customers.push(mapCustomerNode(node));
+        customers.push(mapCustomerNode(node as Parameters<typeof mapCustomerNode>[0]));
       }
     }
   } catch {
@@ -2404,7 +2404,7 @@ async function searchCustomers(
     for (const edge of result.data?.customers?.edges ?? []) {
       const node = edge.node;
       if (!node?.id) continue;
-      customers.push(mapCustomerNode(node));
+      customers.push(mapCustomerNode(node as Parameters<typeof mapCustomerNode>[0]));
     }
 
     return {

@@ -1,3 +1,4 @@
+import type {SellingPlanTranslationsQuery as SellingPlanTranslationsQueryType} from 'types/admin.generated';
 import type {Jobs, RecurringPolicy, Webhooks} from '~/types';
 import {Job} from '~/lib/jobs';
 import {createSellingPlanTranslations} from '~/models/SellingPlan/SellingPlan.server';
@@ -43,7 +44,9 @@ export class CreateSellingPlanTranslationsJob extends Job<
       },
     });
 
-    const json = await response.json();
+    const json = (await response.json()) as {
+      data?: SellingPlanTranslationsQueryType;
+    };
     const {data} = json;
 
     if (!data || !data.sellingPlanGroup) {

@@ -1,4 +1,3 @@
-import type {NodeOnDiskFile} from 'react-router';
 import {vi} from 'vitest';
 import type {GraphQLClient} from '~/types';
 import type {BulkMutationResult} from '~/utils/bulkOperations';
@@ -20,7 +19,7 @@ export function mockBulkOperations() {
       (
         graphql: GraphQLClient,
         mutationString: string,
-        input: File | NodeOnDiskFile | ReadonlyArray<'web' | 'ssr'>,
+        input: File | ReadonlyArray<'web' | 'ssr'>,
         onSuccess?: (results: ReadonlyArray<BulkMutationResult>) => void,
         onFailure?: (error: string) => void,
       ): Promise<BulkOperationWithMetadata> => {

@@ -4,7 +4,7 @@ import {NODE_ENV, SessionStorageConfig} from './types';
 export {NODE_ENV, SessionStorageConfig} from './types';
 export type {Configuration, NodeEnv} from './types';
 
-const environment: NodeEnv = process.env.NODE_ENV;
+const environment: NodeEnv = process.env.NODE_ENV as NodeEnv;
 
 const isProduction = environment === NODE_ENV.PRODUCTION;
 const isDevelopment = environment === NODE_ENV.DEVELOPMENT;

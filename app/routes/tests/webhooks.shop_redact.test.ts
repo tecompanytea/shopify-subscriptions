@@ -28,7 +28,7 @@ describe('when SHOP_REDACT webhook action is triggered', () => {
       topic: 'SHOP_REDACT',
       payload: shopRedactPayload,
     });
-    const response = await action(ACTION_REQUEST);
+    const response = await action(ACTION_REQUEST as any);
 
     expect(response.status).equal(200);
     expect(enqueueSpy).toHaveBeenCalledWith(
