@@ -1123,6 +1123,7 @@ IndexTable.Row = function IndexTableRow({
     React.createElement(
       's-table-row' as any,
       {
+        id,
         role: 'row',
         onClick,
         style: {cursor: onClick ? 'pointer' : undefined},
