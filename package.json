@@ -1,5 +1,5 @@
 {
-  "name": "subscriptions-app-remix",
+  "name": "shopify-subscriptions",
   "type": "module",
   "private": true,
   "engines": {
