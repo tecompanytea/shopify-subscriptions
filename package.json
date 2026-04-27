@@ -2,6 +2,9 @@
   "name": "subscriptions-app-remix",
   "type": "module",
   "private": true,
+  "engines": {
+    "node": ">=20.19 <22 || >=22.12"
+  },
   "scripts": {
     "build": "NODE_ENV=production react-router build",
     "dev": "dotenv -c development pnpm shopify app dev",
