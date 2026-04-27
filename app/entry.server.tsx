@@ -1,9 +1,7 @@
 import {createReadableStreamFromReadable} from '@react-router/node';
 import ShopifyFormat from '@shopify/i18next-shopify';
 import {createInstance} from 'i18next';
-import Backend from 'i18next-fs-backend';
 import {isbot} from 'isbot';
-import {resolve} from 'node:path';
 import {renderToPipeableStream} from 'react-dom/server';
 import {I18nextProvider, initReactI18next} from 'react-i18next';
 import type {
@@ -16,6 +14,7 @@ import {ServerRouter} from 'react-router';
 import {PassThrough} from 'stream';
 
 import {logger} from '~/utils/logger.server';
+import {localesBackend} from './i18n/i18n.resources.server';
 import {getLocale, getRouteNamespaces} from './i18n/i18n.server';
 import i18nextOptions from './i18n/i18nextOptions';
 import {addDocumentResponseHeaders} from './shopify.server';
@@ -83,12 +82,11 @@ export default async function handleRequest(
   await i18next
     .use(initReactI18next)
     .use(ShopifyFormat.default ?? ShopifyFormat)
-    .use(Backend)
+    .use(localesBackend)
     .init({
       ...i18nextOptions,
       lng,
       ns,
-      backend: {loadPath: resolve('./public/locales/{{lng}}/{{ns}}.json')},
     });
 
   const callbackName = isbot(request.headers.get('user-agent'))
