@@ -34,10 +34,14 @@ const APP_CONTENT_SECURITY_POLICY =
 
 export function mergeContentSecurityPolicyHeaders(headers: Headers): void {
   const shopifyPolicy = headers.get('Content-Security-Policy');
-  headers.set(
-    'Content-Security-Policy',
-    [shopifyPolicy, APP_CONTENT_SECURITY_POLICY].filter(Boolean).join(' '),
-  );
+  // Joining two CSP directive lists requires a `; ` separator. Joining with
+  // a space produces a malformed header where `frame-ancestors ...` would
+  // bleed into our `default-src ...` directive.
+  const merged = [shopifyPolicy, APP_CONTENT_SECURITY_POLICY]
+    .filter(Boolean)
+    .map((policy) => policy!.trim().replace(/;\s*$/, ''))
+    .join('; ');
+  headers.set('Content-Security-Policy', merged);
 }
 
 export function handleError(
