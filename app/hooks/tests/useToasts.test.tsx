@@ -1,4 +1,4 @@
-import {describe, expect, it, vi, beforeEach} from 'vitest';
+import {afterAll, describe, expect, it, vi, beforeEach} from 'vitest';
 import {renderHook} from '@testing-library/react';
 import {useLoaderData, useActionData} from 'react-router';
 import {toast} from '~/utils/toast';

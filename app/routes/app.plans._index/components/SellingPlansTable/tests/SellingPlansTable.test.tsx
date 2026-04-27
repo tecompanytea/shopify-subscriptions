@@ -1,7 +1,7 @@
 import {mountComponentWithRemixStub} from '#/test-utils';
 import {screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {describe, expect, it, vi} from 'vitest';
+import {afterAll, describe, expect, it, vi} from 'vitest';
 import {SellingPlanInterval} from '~/types';
 import {SellingPlanAdjustment} from '~/types/plans';
 import SellingPlansTable from '../SellingPlansTable';
@@ -151,6 +151,13 @@ vi.mock('react-router', async (originalImport) => {
     useLoaderData: useLoaderDataMock,
     useNavigation: useNavigationMock,
   };
+});
+
+// Unmock react-router after this file finishes so the file-level vi.mock()
+// above doesn't leak its useLoaderData / useNavigation overrides into other
+// suites that share the same dedupe'd module instance.
+afterAll(() => {
+  vi.doUnmock('react-router');
 });
 
 describe('Subscriptions index page', () => {

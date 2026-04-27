@@ -1,7 +1,7 @@
 import {screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {mountComponentWithRemixStub} from '#/test-utils';
-import {afterEach, describe, expect, it, vi} from 'vitest';
+import {afterAll, afterEach, describe, expect, it, vi} from 'vitest';
 import type {Product} from '~/types';
 import {useSellingPlanFormSchema} from '~/routes/app.plans.$id/validator';
 import {Form} from '~/components/Form';
@@ -30,6 +30,13 @@ vi.mock('@rvf/react-router', async (originalImport) => {
       return form;
     },
   };
+});
+
+// See SellingPlansTable.test.tsx — unmock so the override doesn't leak to
+// other suites via the shared deduped react-router module.
+afterAll(() => {
+  vi.doUnmock('react-router');
+  vi.doUnmock('@rvf/react-router');
 });
 
 const mockSelectedProducts: Product[] = [

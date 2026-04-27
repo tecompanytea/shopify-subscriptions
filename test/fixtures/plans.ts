@@ -3,7 +3,7 @@ import type {
   CreateSellingPlanGroupMutation as CreateSellingPlanGroupMutationType,
   SellingPlanGroupQuery as SellingPlanGroupQueryType,
 } from 'types/admin.generated';
-import {SellingPlanInterval} from 'types/admin.types';
+import {SellingPlanInterval} from '~/types';
 type GraphqlSellingPlanGroup = NonNullable<
   SellingPlanGroupQueryType['sellingPlanGroup']
 >;
