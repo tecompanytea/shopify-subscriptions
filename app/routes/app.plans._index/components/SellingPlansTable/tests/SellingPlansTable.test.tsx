@@ -139,26 +139,13 @@ const mockPlans = [
   },
 ];
 
-const useLoaderDataMock = vi.hoisted(() => vi.fn());
-useLoaderDataMock.mockReturnValue({plans: mockPlans, pagination: {}});
-const useNavigationMock = vi.hoisted(() => vi.fn());
-useNavigationMock.mockReturnValue({state: {}});
-
-vi.mock('react-router', async (originalImport) => {
-  const original: any = await originalImport();
-  return {
-    ...original,
-    useLoaderData: useLoaderDataMock,
-    useNavigation: useNavigationMock,
-  };
-});
-
-// Unmock react-router after this file finishes so the file-level vi.mock()
-// above doesn't leak its useLoaderData / useNavigation overrides into other
-// suites that share the same dedupe'd module instance.
-afterAll(() => {
-  vi.doUnmock('react-router');
-});
+// Previously this file used vi.mock('react-router') to override
+// useLoaderData / useNavigation. With the resolve.dedupe alias that gives
+// every file a single react-router instance, that mock leaks into other
+// test files (notably ContractsList bulk actions). The component under
+// test only consumes useNavigation().state for a loading indicator, and
+// createRoutesStub provides the real hook with state === 'idle' which is
+// fine for these assertions, so the mock isn't needed.
 
 describe('Subscriptions index page', () => {
   it('renders the table view if contracts exist', async () => {
