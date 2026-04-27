@@ -23,6 +23,23 @@ import {addDocumentResponseHeaders} from './shopify.server';
 // Reject/cancel all pending promises after 5 seconds
 export const streamTimeout = 5000;
 
+const APP_CONTENT_SECURITY_POLICY =
+  "default-src 'self'; \
+  script-src 'self' 'unsafe-inline' https://cdn.shopify.com; \
+  style-src 'self' 'unsafe-inline' https://cdn.shopify.com; \
+  font-src 'self' https://cdn.shopify.com; \
+  img-src 'self' data: https://cdn.shopify.com; \
+  connect-src 'self' https://atlas.shopifysvc.com https://extensions.shopifycdn.com https://cdn.shopify.com; \
+  upgrade-insecure-requests";
+
+export function mergeContentSecurityPolicyHeaders(headers: Headers): void {
+  const shopifyPolicy = headers.get('Content-Security-Policy');
+  headers.set(
+    'Content-Security-Policy',
+    [shopifyPolicy, APP_CONTENT_SECURITY_POLICY].filter(Boolean).join(' '),
+  );
+}
+
 export function handleError(
   error: Error,
   {request: req, params, context}: LoaderFunctionArgs | ActionFunctionArgs,
@@ -89,22 +106,7 @@ export default async function handleRequest(
           responseHeaders.set('X-Download-Options', 'noopen');
           responseHeaders.set('X-Permitted-Cross-Domain-Policies', 'none');
           responseHeaders.set('Referrer-Policy', 'origin-when-cross-origin');
-          // CSP: addDocumentResponseHeaders above already set
-          // `frame-ancestors` for the embedded admin frame. Re-issuing
-          // CSP via .set() would overwrite that and break the embed
-          // (postMessage origin mismatch). Append the additional
-          // directives we want as a second CSP header instead — browsers
-          // apply intersection of all CSP headers.
-          responseHeaders.append(
-            'Content-Security-Policy',
-            "default-src 'self'; \
-            script-src 'self' 'unsafe-inline' https://cdn.shopify.com; \
-            style-src 'self' 'unsafe-inline' https://cdn.shopify.com; \
-            font-src 'self' https://cdn.shopify.com; \
-            img-src 'self' data: https://cdn.shopify.com; \
-            connect-src 'self' https://atlas.shopifysvc.com https://extensions.shopifycdn.com https://cdn.shopify.com; \
-            upgrade-insecure-requests",
-          );
+          mergeContentSecurityPolicyHeaders(responseHeaders);
           responseHeaders.set(
             'Strict-Transport-Security',
             'max-age=631138519; includeSubDomains',
