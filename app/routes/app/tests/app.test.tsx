@@ -1,7 +1,8 @@
 import {mountRemixStubWithAppContext, wait} from '#/test-utils';
-import {screen} from '@testing-library/react';
+import {render, screen} from '@testing-library/react';
+import {data} from 'react-router';
 import {describe, expect, it, beforeEach, vi} from 'vitest';
-import App, {ErrorBoundary, loader} from '../route';
+import App, {ErrorBoundary, loader, renderRouteError} from '../route';
 import {createMockShopContext} from '~/routes/app.contracts.$id._index/tests/Fixtures';
 import {APP_URL, BASE64_HOST, TEST_SHOP} from 'test/constants';
 
@@ -35,6 +36,46 @@ async function mountApp(error = false) {
               throw new Error('Test Error');
             }
           : loader,
+        ErrorBoundary,
+      },
+    ],
+    remixStubProps: {
+      initialEntries: [`/app/`],
+    },
+    shopContext: createMockShopContext(),
+  });
+  return wait(500);
+}
+
+async function mountAppWithRouteResponseError() {
+  mountRemixStubWithAppContext({
+    routes: [
+      {
+        path: `/app`,
+        Component: () => <App />,
+        loader: () => {
+          throw data('', {status: 410, statusText: 'Gone'});
+        },
+        ErrorBoundary,
+      },
+    ],
+    remixStubProps: {
+      initialEntries: [`/app/`],
+    },
+    shopContext: createMockShopContext(),
+  });
+  return wait(500);
+}
+
+async function mountAppWithRawResponseError() {
+  mountRemixStubWithAppContext({
+    routes: [
+      {
+        path: `/app`,
+        Component: () => <App />,
+        loader: () => {
+          throw new Response('', {status: 410, statusText: 'Gone'});
+        },
         ErrorBoundary,
       },
     ],
@@ -117,5 +158,30 @@ describe('Error Boundary', () => {
     await mountApp(true);
 
     expect(screen.getByText('Unable to load page')).toBeInTheDocument();
+  });
+
+  it('renders Shopify route response errors consistently for hydration', async () => {
+    await mountAppWithRouteResponseError();
+
+    expect(screen.getByText('Handling response')).toBeInTheDocument();
+  });
+
+  it('renders raw Shopify response errors consistently for hydration', async () => {
+    await mountAppWithRawResponseError();
+
+    expect(screen.getByText('Handling response')).toBeInTheDocument();
+  });
+
+  it('renders serialized route response errors consistently for hydration', () => {
+    render(
+      renderRouteError({
+        status: 410,
+        statusText: 'Gone',
+        internal: false,
+        data: '',
+      }),
+    );
+
+    expect(screen.getByText('Handling response')).toBeInTheDocument();
   });
 });

@@ -1,5 +1,11 @@
 import {data} from 'react-router';
-import {Link, Outlet, useLoaderData, useRouteError} from 'react-router';
+import {
+  isRouteErrorResponse,
+  Link,
+  Outlet,
+  useLoaderData,
+  useRouteError,
+} from 'react-router';
 import {parseGid} from '@shopify/admin-graphql-api-utilities';
 import {NavMenu} from '@shopify/app-bridge-react';
 import {boundary} from '@shopify/shopify-app-react-router/server';
@@ -87,11 +93,39 @@ export default function App() {
   );
 }
 
+function isSerializedRouteResponse(error: unknown): error is {data?: unknown} {
+  return (
+    error !== null &&
+    typeof error === 'object' &&
+    'status' in error &&
+    'statusText' in error &&
+    'data' in error
+  );
+}
+
+export function renderRouteError(error: unknown) {
+  try {
+    return boundary.error(error);
+  } catch {
+    if (isRouteErrorResponse(error) || isSerializedRouteResponse(error)) {
+      const data = (error as {data?: unknown}).data;
+      return (
+        <div
+          dangerouslySetInnerHTML={{
+            __html: typeof data === 'string' && data ? data : 'Handling response',
+          }}
+        />
+      );
+    }
+
+    throw error;
+  }
+}
+
 export function ErrorBoundary() {
   const error = useRouteError();
   try {
-    const shopifyError = boundary.error(error);
-    return shopifyError;
+    return renderRouteError(error);
   } catch {
     if (process.env.NODE_ENV === 'development') {
       console.error(error);
