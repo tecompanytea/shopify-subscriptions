@@ -6,7 +6,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import {useNavigate} from '@remix-run/react';
+import {useNavigate} from 'react-router';
 import {parseGid} from '@shopify/admin-graphql-api-utilities';
 import {
   BlockStack,

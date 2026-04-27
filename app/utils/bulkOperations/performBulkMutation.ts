@@ -1,4 +1,3 @@
-import type {NodeOnDiskFile} from '@remix-run/node';
 import type {GraphQLClient} from '~/types';
 
 import {logger} from '~/utils/logger.server';
@@ -29,7 +28,7 @@ function handleError(error: any, onFailure?: (error: string) => void) {
 export async function performBulkMutation<T>(
   graphql: GraphQLClient,
   mutationString: string,
-  input: File | NodeOnDiskFile | ReadonlyArray<T>,
+  input: File | ReadonlyArray<T>,
   onSuccess?: (results: ReadonlyArray<BulkMutationResult>) => void,
   onFailure?: (error: string) => void,
 ): Promise<BulkOperationWithMetadata> {

@@ -1,10 +1,10 @@
-import {json} from '@remix-run/node';
-import type {ActionFunctionArgs, TypedResponse} from '@remix-run/node';
+import {data} from 'react-router';
+import type {ActionFunctionArgs} from 'react-router';
 import {composeGid} from '@shopify/admin-graphql-api-utilities';
-import i18n from '~/i18n/i18next.server';
+import i18n from '~/i18n/i18n.server';
 import {SubscriptionContractCancelService} from '~/services/SubscriptionContractCancelService';
 import {authenticate} from '~/shopify.server';
-import type {WithToast} from '~/types';
+import type {TypedResponse, WithToast} from '~/types';
 import {toast} from '~/utils/toast';
 
 // This code is tested in the context of where it is used on the contract details page
@@ -24,9 +24,9 @@ export async function action({
       contractId,
     ).run();
 
-    return json(toast(t('actions.cancel.success')));
+    return data(toast(t('actions.cancel.success')));
   } catch (e) {
-    return json({
+    return data({
       error: true,
       ...toast(t('actions.cancel.error'), {isError: true}),
     });

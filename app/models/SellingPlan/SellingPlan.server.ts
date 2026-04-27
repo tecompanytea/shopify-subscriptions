@@ -14,7 +14,7 @@ import DeleteSellingPlanGroupMutation from '~/graphql/DeleteSellingPlanGroupMuta
 import SellingPlanGroupQuery from '~/graphql/SellingPlanGroupQuery';
 import SellingPlanGroupUpdateMutation from '~/graphql/SellingPlanGroupUpdateMutation';
 import SellingPlanGroupsQuery from '~/graphql/SellingPlanGroupsQuery';
-import i18n from '~/i18n/i18next.server';
+import i18n from '~/i18n/i18n.server';
 import {
   NEW_DELIVERY_OPTION_ID,
   formatSelectedProducts,

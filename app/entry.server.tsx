@@ -1,11 +1,4 @@
-import {
-  createReadableStreamFromReadable,
-  type ActionFunctionArgs,
-  type AppLoadContext,
-  type EntryContext,
-  type LoaderFunctionArgs,
-} from '@remix-run/node';
-import {RemixServer} from '@remix-run/react';
+import {createReadableStreamFromReadable} from '@react-router/node';
 import ShopifyFormat from '@shopify/i18next-shopify';
 import {createInstance} from 'i18next';
 import Backend from 'i18next-fs-backend';
@@ -13,10 +6,17 @@ import {isbot} from 'isbot';
 import {resolve} from 'node:path';
 import {renderToPipeableStream} from 'react-dom/server';
 import {I18nextProvider, initReactI18next} from 'react-i18next';
+import type {
+  ActionFunctionArgs,
+  AppLoadContext,
+  EntryContext,
+  LoaderFunctionArgs,
+} from 'react-router';
+import {ServerRouter} from 'react-router';
 import {PassThrough} from 'stream';
 
 import {logger} from '~/utils/logger.server';
-import i18nextServer from './i18n/i18next.server';
+import {getLocale, getRouteNamespaces} from './i18n/i18n.server';
 import i18nextOptions from './i18n/i18nextOptions';
 import {addDocumentResponseHeaders} from './shopify.server';
 
@@ -50,14 +50,14 @@ export default async function handleRequest(
   request: Request,
   responseStatusCode: number,
   responseHeaders: Headers,
-  remixContext: EntryContext,
+  entryContext: EntryContext,
   _loadContext: AppLoadContext,
 ) {
   addDocumentResponseHeaders(request, responseHeaders);
 
   const i18next = createInstance();
-  const lng = await i18nextServer.getLocale(request);
-  const ns = i18nextServer.getRouteNamespaces(remixContext);
+  const lng = getLocale(request);
+  const ns = getRouteNamespaces(entryContext);
 
   await i18next
     .use(initReactI18next)
@@ -74,10 +74,10 @@ export default async function handleRequest(
     ? 'onAllReady'
     : 'onShellReady';
 
-  return new Promise((resolve, reject) => {
+  return new Promise((resolvePromise, reject) => {
     const {pipe, abort} = renderToPipeableStream(
       <I18nextProvider i18n={i18next}>
-        <RemixServer context={remixContext} url={request.url} />
+        <ServerRouter context={entryContext} url={request.url} />
       </I18nextProvider>,
       {
         [callbackName]: () => {
@@ -104,7 +104,7 @@ export default async function handleRequest(
             'max-age=631138519; includeSubDomains',
           );
 
-          resolve(
+          resolvePromise(
             new Response(stream, {
               headers: responseHeaders,
               status: responseStatusCode,

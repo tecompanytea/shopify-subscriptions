@@ -1,7 +1,7 @@
 import {screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {mountComponentWithRemixStub} from '#/test-utils';
-import {afterEach, describe, expect, it, vi} from 'vitest';
+import {afterAll, afterEach, describe, expect, it, vi} from 'vitest';
 import type {Product} from '~/types';
 import {useSellingPlanFormSchema} from '~/routes/app.plans.$id/validator';
 import {Form} from '~/components/Form';
@@ -12,7 +12,7 @@ import {mockShopify} from '#/setup-app-bridge';
 const formErrorMock = vi.hoisted(() => vi.fn());
 const useLoaderDataMock = vi.hoisted(() => vi.fn(() => ({plan: null})));
 
-vi.mock('@remix-run/react', async (originalImport) => {
+vi.mock('react-router', async (originalImport) => {
   const original: any = await originalImport();
   return {
     ...original,
@@ -20,7 +20,7 @@ vi.mock('@remix-run/react', async (originalImport) => {
   };
 });
 
-vi.mock('@rvf/remix', async (originalImport) => {
+vi.mock('@rvf/react-router', async (originalImport) => {
   const original: any = await originalImport();
   return {
     ...original,
@@ -30,6 +30,13 @@ vi.mock('@rvf/remix', async (originalImport) => {
       return form;
     },
   };
+});
+
+// See SellingPlansTable.test.tsx — unmock so the override doesn't leak to
+// other suites via the shared deduped react-router module.
+afterAll(() => {
+  vi.doUnmock('react-router');
+  vi.doUnmock('@rvf/react-router');
 });
 
 const mockSelectedProducts: Product[] = [

@@ -24,7 +24,7 @@ describe('when SHOP_REDACT webhook action is triggered', () => {
       topic: 'CUSTOMERS_DATA_REQUEST',
       payload: {},
     });
-    const response = await action(ACTION_REQUEST);
+    const response = await action(ACTION_REQUEST as any);
 
     expect(response.status).equal(200);
     expect(enqueueSpy).not.toHaveBeenCalled();
@@ -36,7 +36,7 @@ describe('when SHOP_REDACT webhook action is triggered', () => {
       topic: 'CUSTOMERS_REDACT',
       payload: {},
     });
-    const response = await action(ACTION_REQUEST);
+    const response = await action(ACTION_REQUEST as any);
     expect(response.status).equal(200);
     expect(enqueueSpy).not.toHaveBeenCalled();
   });

@@ -12,7 +12,11 @@ import {DiscountDeliveryOptionLine} from '../DiscountDeliveryOptionLine';
 function WithForm({children}: {children: React.ReactNode}) {
   const schema = useSellingPlanFormSchema();
 
-  return <Form schema={schema}>{children}</Form>;
+  return (
+    <Form schema={schema} defaultValues={{}}>
+      {children}
+    </Form>
+  );
 }
 
 function mountWithForm(children: React.ReactNode) {

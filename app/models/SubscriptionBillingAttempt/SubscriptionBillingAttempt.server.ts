@@ -2,6 +2,7 @@ import {DateTime} from 'luxon';
 import type {
   SubscriptionBillingCycleByIndexQuery as SubscriptionBillingCycleByIndexQueryType,
   SubscriptionBillingCyclesQuery as SubscriptionBillingCyclesQueryType,
+  SubscriptionPastBillingCyclesQuery as SubscriptionPastBillingCyclesQueryType,
 } from 'types/admin.generated';
 import type {
   FailedBillingCycle,
@@ -81,7 +82,9 @@ export async function getPastBillingCycles(
         },
       });
 
-      const {data} = await response.json();
+      const {data} = (await response.json()) as {
+        data: SubscriptionPastBillingCyclesQueryType;
+      };
 
       return nodesFromEdges(data?.subscriptionBillingCycles.edges || []);
     } catch (err) {

@@ -1,12 +1,12 @@
 import {useTranslation} from 'react-i18next';
 import {TablePagination} from '~/components';
 
-import type {LoaderFunctionArgs} from '@remix-run/node';
+import type {LoaderFunctionArgs} from 'react-router';
 import {
   useLoaderData,
   useNavigate,
   type ShouldRevalidateFunction,
-} from '@remix-run/react';
+} from 'react-router';
 import {
   Button,
   Box,

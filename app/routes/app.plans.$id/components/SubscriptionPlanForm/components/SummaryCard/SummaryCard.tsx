@@ -1,6 +1,6 @@
 import {BlockStack, Card, List, Text} from '~/components/polaris';
 import {useTranslation} from 'react-i18next';
-import {useFormContext} from '@rvf/remix';
+import {useFormContext} from '@rvf/react-router';
 import {DeliverySummary, ProductSummary} from './components';
 import type {SellingPlanModeType} from '~/routes/app.plans.$id/validator';
 

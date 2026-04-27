@@ -1,4 +1,4 @@
-import {json} from '@remix-run/node';
+import {data} from 'react-router';
 import {
   Button,
   Card,
@@ -9,7 +9,7 @@ import {
 } from '~/components/polaris';
 import {useState} from 'react';
 
-import {Form, useActionData, useLoaderData} from '@remix-run/react';
+import {Form, useActionData, useLoaderData} from 'react-router';
 import {ShopifyAppProvider} from '~/components/ShopifyAppProvider';
 
 import {login} from '../../shopify.server';
@@ -18,7 +18,7 @@ import {loginErrorMessage} from './error.server';
 export async function loader({request}) {
   const errors = loginErrorMessage(await login(request));
 
-  return json({
+  return data({
     errors,
   });
 }
@@ -26,7 +26,7 @@ export async function loader({request}) {
 export async function action({request}) {
   const errors = loginErrorMessage(await login(request));
 
-  return json({
+  return data({
     errors,
   });
 }

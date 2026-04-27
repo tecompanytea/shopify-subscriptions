@@ -1,7 +1,10 @@
 import {nodesFromEdges} from '@shopify/admin-graphql-api-utilities';
 import type {
   ProductVariantPriceQuery as ProductVariantPriceQueryData,
+  SubscriptionContractDetailsQuery as SubscriptionContractDetailsQueryData,
   SubscriptionContractEditDetailsQuery as SubscriptionContractEditDetailsQueryData,
+  SubscriptionContractRebillingQueryQuery as SubscriptionContractRebillingQueryData,
+  SubscriptionContractsQuery as SubscriptionContractsQueryData,
   SubscriptionContractsQueryVariables,
 } from 'types/admin.generated';
 
@@ -85,7 +88,9 @@ export async function getContracts(
     variables,
   });
 
-  const {data} = await response.json();
+  const {data} = (await response.json()) as {
+    data?: SubscriptionContractsQueryData;
+  };
 
   const formattedSubscriptionContracts = nodesFromEdges(
     data?.subscriptionContracts?.edges || [],
@@ -154,7 +159,9 @@ export async function getContractDetailsForRebilling(
     },
   });
 
-  const {data} = await response.json();
+  const {data} = (await response.json()) as {
+    data?: SubscriptionContractRebillingQueryData;
+  };
   const subscriptionContract = data?.subscriptionContract;
 
   if (!subscriptionContract) {
@@ -175,7 +182,9 @@ export async function getContractDetails(
     },
   });
 
-  const {data} = await response.json();
+  const {data} = (await response.json()) as {
+    data?: SubscriptionContractDetailsQueryData;
+  };
   const subscriptionContract = data?.subscriptionContract;
 
   if (!subscriptionContract) {
@@ -235,7 +244,7 @@ export async function getContractDetails(
       subtotalPrice,
       totalShippingPrice,
     },
-  };
+  } as SubscriptionContractDetails;
 }
 
 export async function getContractEditDetails(

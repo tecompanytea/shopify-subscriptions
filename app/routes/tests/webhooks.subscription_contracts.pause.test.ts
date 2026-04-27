@@ -28,7 +28,7 @@ describe('when webhook action is triggered', () => {
       topic: 'SUBSCRIPTION_CONTRACTS_PAUSE',
       payload: subscriptionContractPayload,
     });
-    const response = await action(ACTION_REQUEST);
+    const response = await action(ACTION_REQUEST as any);
 
     expect(response.status).toBe(200);
   });

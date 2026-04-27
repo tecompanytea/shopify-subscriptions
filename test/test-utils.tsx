@@ -1,5 +1,5 @@
-import type {RemixStubProps} from '@remix-run/testing';
-import {createRemixStub} from '@remix-run/testing';
+import type {RoutesTestStubProps} from 'react-router';
+import {createRoutesStub} from 'react-router';
 import {render} from '@testing-library/react';
 import {parse} from 'graphql';
 import type {ReactElement} from 'react';
@@ -48,14 +48,26 @@ export function mountRemixStubWithAppContext({
   remixStubProps,
   shopContext,
 }: {
-  routes: Parameters<typeof createRemixStub>[0];
-  context?: Parameters<typeof createRemixStub>[1];
-  remixStubProps?: RemixStubProps;
+  routes: Parameters<typeof createRoutesStub>[0];
+  context?: Parameters<typeof createRoutesStub>[1];
+  remixStubProps?: RoutesTestStubProps;
   shopContext?: Partial<ShopContextValue>;
 }) {
-  const RemixStub = createRemixStub(routes, context);
+  const RoutesStub = createRoutesStub(routes, context);
 
-  return mountWithAppContext(<RemixStub {...remixStubProps} />, shopContext);
+  // RR7's useActionData invariant fires if the data router hydrates without
+  // an actionData slot, which breaks @rvf/react-router's useForm (it calls
+  // useActionData unconditionally). Seed an empty actionData so components
+  // that render before any action has run still get a valid context.
+  const stubProps: RoutesTestStubProps = {
+    ...remixStubProps,
+    hydrationData: {
+      actionData: {},
+      ...remixStubProps?.hydrationData,
+    },
+  };
+
+  return mountWithAppContext(<RoutesStub {...stubProps} />, shopContext);
 }
 
 /**
@@ -71,6 +83,29 @@ export function mountComponentWithRemixStub(element: ReactElement) {
       },
     ],
   });
+}
+
+/**
+ * Unwraps a loader/action return value for tests that invoke them directly.
+ * RR7 loaders/actions can return plain data, a data() DataWithResponseInit
+ * wrapper, or a raw Response — this normalizes all three so existing
+ * `.status` / `.json()` assertions keep working.
+ */
+export async function unwrapLoaderResponse<T = any>(
+  response: any,
+): Promise<{status: number; data: T}> {
+  if (response instanceof Response) {
+    const cloned = response.clone();
+    const data = (await cloned.json()) as T;
+    return {status: response.status, data};
+  }
+  if (response && typeof response === 'object' && 'data' in response) {
+    return {
+      status: response.init?.status ?? 200,
+      data: response.data as T,
+    };
+  }
+  return {status: 200, data: response as T};
 }
 
 /**

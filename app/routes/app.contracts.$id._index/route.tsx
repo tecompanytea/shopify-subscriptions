@@ -1,4 +1,4 @@
-import {type ShouldRevalidateFunction, useLoaderData} from '@remix-run/react';
+import {type ShouldRevalidateFunction, useLoaderData} from 'react-router';
 import {composeGid, parseGid} from '@shopify/admin-graphql-api-utilities';
 import {
   BlockStack,
@@ -24,6 +24,7 @@ import {CancelSubscriptionModal} from './components/CancelSubscriptionModal/Canc
 import {CustomerDetailsCard} from './components/CustomerDetailsCard/CustomerDetailsCard';
 import {CustomerPaymentMethodDetailsCard} from './components/CustomerPaymentMethodDetailsCard/CustomerPaymentMethodDetailsCard';
 import {PastOrdersCard} from './components/PastOrdersCard/PastOrdersCard';
+import {ContractNotesCard} from './components/ContractNotesCard/ContractNotesCard';
 import {SubscriptionDetailsCard} from './components/SubscriptionDetailsCard/SubscriptionDetailsCard';
 import {UpcomingBillingCyclesCard} from './components/UpcomingBillingCyclesCard/UpcomingBillingCyclesCard';
 import {usePauseAction} from './hooks/usePauseAction';
@@ -285,6 +286,7 @@ export default function ContractsDetailsPage() {
           </Grid.Cell>
           <Grid.Cell columnSpan={{xs: 1, sm: 1, md: 1, lg: 1, xl: 1}}>
             <BlockStack gap="400">
+              <ContractNotesCard note={subscriptionContract.note} />
               {customer ? (
                 <CustomerDetailsCard
                   customer={customer}

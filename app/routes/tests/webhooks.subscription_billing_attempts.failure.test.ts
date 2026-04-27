@@ -38,7 +38,7 @@ describe('when webhook action is triggered', () => {
       topic: 'SUBSCRIPTION_BILLING_ATTEMPTS_FAILURE',
       payload: subscriptionBillingAttemptPayload,
     });
-    await action(ACTION_REQUEST);
+    await action(ACTION_REQUEST as any);
 
     expect(enqueueSpy).toHaveBeenCalledWith(
       new DunningStartJob({

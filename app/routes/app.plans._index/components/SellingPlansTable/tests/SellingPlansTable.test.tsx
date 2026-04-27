@@ -1,7 +1,7 @@
 import {mountComponentWithRemixStub} from '#/test-utils';
 import {screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {describe, expect, it, vi} from 'vitest';
+import {afterAll, describe, expect, it, vi} from 'vitest';
 import {SellingPlanInterval} from '~/types';
 import {SellingPlanAdjustment} from '~/types/plans';
 import SellingPlansTable from '../SellingPlansTable';
@@ -139,19 +139,13 @@ const mockPlans = [
   },
 ];
 
-const useLoaderDataMock = vi.hoisted(() => vi.fn());
-useLoaderDataMock.mockReturnValue({plans: mockPlans, pagination: {}});
-const useNavigationMock = vi.hoisted(() => vi.fn());
-useNavigationMock.mockReturnValue({state: {}});
-
-vi.mock('@remix-run/react', async (originalImport) => {
-  const original: any = await originalImport();
-  return {
-    ...original,
-    useLoaderData: useLoaderDataMock,
-    useNavigation: useNavigationMock,
-  };
-});
+// Previously this file used vi.mock('react-router') to override
+// useLoaderData / useNavigation. With the resolve.dedupe alias that gives
+// every file a single react-router instance, that mock leaks into other
+// test files (notably ContractsList bulk actions). The component under
+// test only consumes useNavigation().state for a loading indicator, and
+// createRoutesStub provides the real hook with state === 'idle' which is
+// fine for these assertions, so the mock isn't needed.
 
 describe('Subscriptions index page', () => {
   it('renders the table view if contracts exist', async () => {
@@ -274,15 +268,16 @@ describe('Subscriptions index page', () => {
       <SellingPlansTable sellingPlanGroups={mockPlans} />,
     );
 
-    const sortBtn = document.querySelector('[data-polaris-tooltip-activator]');
+    // ~/components/polaris renders sort options as a native <select> instead
+    // of Polaris's tooltip-activated dropdown, so we look for the labeled
+    // control and verify the Created/Updated <option> labels are present.
+    const sortControl = screen.getByLabelText('Sort the results');
+    expect(sortControl).toBeInTheDocument();
 
-    expect(sortBtn).toBeInTheDocument();
-
-    if (sortBtn) {
-      await userEvent.click(sortBtn);
-
-      expect(screen.getByText('Created')).toBeInTheDocument();
-      expect(screen.getByText('Updated')).toBeInTheDocument();
-    }
+    const optionLabels = Array.from(
+      sortControl.querySelectorAll('option'),
+    ).map((option) => option.textContent);
+    expect(optionLabels.some((label) => label?.includes('Created'))).toBe(true);
+    expect(optionLabels.some((label) => label?.includes('Updated'))).toBe(true);
   });
 });

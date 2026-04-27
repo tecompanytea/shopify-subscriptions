@@ -1,14 +1,12 @@
-import type {ActionFunctionArgs} from '@remix-run/node';
+import type {ActionFunctionArgs, LoaderFunctionArgs} from 'react-router';
 
-import {json} from '@remix-run/node';
 import {CustomerSendEmailJob, jobs} from '~/jobs';
 import {authenticate} from '~/shopify.server';
 import {logger} from '~/utils/logger.server';
 
-export async function loader({request}) {
+export async function loader({request}: LoaderFunctionArgs) {
   const {cors} = await authenticate.public.customerAccount(request);
-  const response = json({body: 'data'});
-  return cors(response);
+  return cors(Response.json({body: 'data'}));
 }
 
 export async function action({request}: ActionFunctionArgs) {
@@ -42,7 +40,7 @@ export async function action({request}: ActionFunctionArgs) {
       throw new Error(`Invalid operation name: ${operationName ?? ''}`);
     }
 
-    return cors(json({status: 'success'}, {status: 200}));
+    return cors(Response.json({status: 'success'}, {status: 200}));
   } catch (err) {
     const error = err instanceof Error ? err : new Error(String(err));
 
@@ -51,6 +49,8 @@ export async function action({request}: ActionFunctionArgs) {
       customer: customerGid,
     });
 
-    return cors(json({status: 'failure', error: error.message}, {status: 500}));
+    return cors(
+      Response.json({status: 'failure', error: error.message}, {status: 500}),
+    );
   }
 }

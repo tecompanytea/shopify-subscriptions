@@ -1,15 +1,14 @@
 import type {
   ActionFunctionArgs,
   LoaderFunctionArgs,
-  TypedResponse,
-} from '@remix-run/node';
-import {json, redirect} from '@remix-run/node';
-import {useLoaderData, useSearchParams} from '@remix-run/react';
+} from 'react-router';
+import {data,redirect} from 'react-router';
+import {useLoaderData, useSearchParams} from 'react-router';
 import {composeGid, parseGid} from '@shopify/admin-graphql-api-utilities';
 import {Page} from '~/components/polaris';
 import {useEffect} from 'react';
 import {useTranslation} from 'react-i18next';
-import i18n from '~/i18n/i18next.server';
+import i18n from '~/i18n/i18n.server';
 import {
   createSellingPlanGroup,
   getSellingPlanGroup,
@@ -26,8 +25,8 @@ import {
 } from './validator';
 
 import {Form} from '~/components/Form/Form';
-import {validationError, type ValidationErrorResponseData} from '@rvf/remix';
-import type {SellingPlanGroup, WithToast} from '~/types';
+import {validationError, type ValidationErrorResponseData} from '@rvf/react-router';
+import type {TypedResponse, SellingPlanGroup, WithToast} from '~/types';
 import {MAX_SELLING_PLAN_PRODUCTS} from '~/utils/constants';
 import {formStringToArray} from '~/utils/helpers/form';
 import {toast} from '~/utils/toast';
@@ -55,13 +54,13 @@ export async function loader({
         ? SellingPlanMode.PREPAID
         : SellingPlanMode.RECURRING;
 
-    return json({
+    return data({
       sellingPlanGroup: getEmptySellingPlan(t, sellingPlanMode),
     });
   }
 
   if (!planID) {
-    throw json({error: 'Plan not found'}, {status: 404});
+    throw data({error: 'Plan not found'}, {status: 404});
   }
 
   const sellingPlanGroup = await getSellingPlanGroup(admin.graphql, {
@@ -81,7 +80,7 @@ export async function loader({
     ? toast(t('SubscriptionPlanForm.createSuccess'))
     : undefined;
 
-  return json({sellingPlanGroup, ...createdToast});
+  return data({sellingPlanGroup, ...createdToast});
 }
 
 export async function action({
@@ -135,7 +134,7 @@ export async function action({
     );
 
     if (!sellingPlanGroupId || userErrors?.length) {
-      return json(
+      return data(
         toast(
           userErrors?.[0]?.message || t('SubscriptionPlanForm.createError'),
           {isError: true},
@@ -155,11 +154,11 @@ export async function action({
     });
 
     if (!existingSellingPlanGroup) {
-      throw json({error: 'Plan not found'}, {status: 404});
+      throw data({error: 'Plan not found'}, {status: 404});
     }
 
     if (existingSellingPlanGroup.hasUnsupportedSellingPlans) {
-      return json(
+      return data(
         toast(t('SubscriptionPlanForm.unsupportedSellingPlanConfiguration'), {
           isError: true,
         }),
@@ -187,7 +186,7 @@ export async function action({
     );
 
     if (!sellingPlanGroupId || userErrors?.length) {
-      return json(
+      return data(
         toast(userErrors[0]?.message || t('SubscriptionPlanForm.updateError'), {
           isError: true,
         }),
@@ -195,9 +194,9 @@ export async function action({
       );
     }
 
-    return json(toast(t('SubscriptionPlanForm.updateSuccess')));
+    return data(toast(t('SubscriptionPlanForm.updateSuccess')));
   } else {
-    throw json({error: 'Plan not found'}, {status: 404});
+    throw data({error: 'Plan not found'}, {status: 404});
   }
 }
 

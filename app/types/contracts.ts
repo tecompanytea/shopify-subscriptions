@@ -7,6 +7,7 @@ import type {Money, RecurringPolicy} from '.';
 export interface SubscriptionContractDetails {
   id: string;
   status: SubscriptionContractStatusType;
+  note?: string | null;
   lines: SubscriptionContractDetailsLine[];
   billingPolicy: RecurringPolicy;
   deliveryPolicy: RecurringPolicy;

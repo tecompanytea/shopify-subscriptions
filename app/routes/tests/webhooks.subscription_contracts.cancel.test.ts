@@ -30,7 +30,7 @@ describe('when webhook action is triggered', () => {
       topic: 'SUBSCRIPTION_CONTRACTS_CANCEL',
       payload: subscriptionContractPayload,
     });
-    await action(ACTION_REQUEST);
+    await action(ACTION_REQUEST as any);
 
     expect(enqueueSpy).toHaveBeenCalledWith(
       new CustomerSendEmailJob({

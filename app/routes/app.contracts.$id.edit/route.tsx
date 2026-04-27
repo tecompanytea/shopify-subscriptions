@@ -1,13 +1,13 @@
-import type {ActionFunctionArgs, TypedResponse} from '@remix-run/node';
-import {json} from '@remix-run/node';
-import {useLoaderData} from '@remix-run/react';
+import type {ActionFunctionArgs} from 'react-router';
+import {data} from 'react-router';
+import {useLoaderData} from 'react-router';
 import {composeGid, parseGid} from '@shopify/admin-graphql-api-utilities';
 import {BlockStack, Page, PageActions} from '~/components/polaris';
 import {useTranslation} from 'react-i18next';
 import {StatusBadge} from '~/components';
 import {Form} from '~/components/Form';
 import {SubmitButton} from '~/components/SubmitButton';
-import i18n from '~/i18n/i18next.server';
+import i18n from '~/i18n/i18n.server';
 import {getContractEditDetails} from '~/models/SubscriptionContract/SubscriptionContract.server';
 import {authenticate} from '~/shopify.server';
 import {isNonEmptyString} from '~/utils/helpers/form';
@@ -30,7 +30,7 @@ import {
 import {buildDraftFromContract} from '~/models/SubscriptionContractDraft/SubscriptionContractDraft.server';
 import {formatStatus} from '~/utils/helpers/contracts';
 import {useToasts} from '~/hooks';
-import type {WithToast} from '~/types';
+import type {TypedResponse, WithToast} from '~/types';
 import {toast} from '~/utils/toast';
 import {validateFormData} from '~/utils/validateFormData';
 
@@ -62,7 +62,7 @@ export async function action({
 
   const contractId = params.id;
 
-  const contractUpdateError = json(
+  const contractUpdateError = data(
     toast(t('edit.actions.updateContract.error'), {isError: true}),
   );
 
@@ -178,7 +178,7 @@ export async function action({
     return contractUpdateError;
   }
 
-  return json(toast(t('edit.actions.updateContract.success')));
+  return data(toast(t('edit.actions.updateContract.success')));
 }
 
 export default function ContractEditPage() {

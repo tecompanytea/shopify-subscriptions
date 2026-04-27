@@ -1,6 +1,6 @@
-import type {ActionFunctionArgs, TypedResponse} from '@remix-run/node';
-import {json} from '@remix-run/node';
-import {useLoaderData, useNavigate, useSearchParams} from '@remix-run/react';
+import type {ActionFunctionArgs} from 'react-router';
+import {data} from 'react-router';
+import {useLoaderData, useNavigate, useSearchParams} from 'react-router';
 import {
   Box,
   Card,
@@ -12,15 +12,15 @@ import {
 } from '~/components/polaris';
 import {PlusCircleIcon} from '~/components/polaris-icons';
 import {useTranslation} from 'react-i18next';
-import type {ValidationErrorResponseData} from '@rvf/remix';
+import type {ValidationErrorResponseData} from '@rvf/react-router';
 import {TablePagination} from '~/components';
-import i18n from '~/i18n/i18next.server';
+import i18n from '~/i18n/i18n.server';
 import {
   deleteSellingPlanGroup,
   getSellingPlanGroups,
 } from '~/models/SellingPlan/SellingPlan.server';
 import {authenticate} from '~/shopify.server';
-import type {PaginationInfo, WithToast} from '~/types';
+import type {TypedResponse, PaginationInfo, WithToast} from '~/types';
 import type {SellingPlanGroupListItem} from '~/types/plans';
 import {isRejected} from '~/utils/typeGuards/promises';
 import SellingPlansTable from './components/SellingPlansTable/SellingPlansTable';
@@ -75,7 +75,7 @@ export async function action({
   const t = await i18n.getFixedT(request, 'app.plans');
   const sellingPlanGroupIds: string[] = String(body.get('ids'))?.split(',');
 
-  const errorResponse = json(
+  const errorResponse = data(
     toast(
       t('table.deletePlan.toast.failed', {
         count: sellingPlanGroupIds?.length || 0,
@@ -97,7 +97,7 @@ export async function action({
 
   if (response.some(isRejected)) return errorResponse;
 
-  return json(
+  return data(
     toast(
       t('table.deletePlan.toast.success', {count: sellingPlanGroupIds.length}),
       {isError: false},

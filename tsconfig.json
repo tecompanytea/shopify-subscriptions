@@ -5,8 +5,10 @@
     "test/**/*",
     "extensions/**/*",
     "config/**/*",
+    "types/**/*",
     "type-definitions/global.d.ts",
-    "type-definitions/index.d.ts"
+    "type-definitions/index.d.ts",
+    ".react-router/types/**/*"
   ],
   "exclude": ["build", "public", "node_modules/**/*", "extensions/*"],
   "compilerOptions": {
@@ -31,8 +33,10 @@
     "types": [
       "@shopify/app-bridge-types",
       "@shopify/polaris-types",
+      "@react-router/node",
       "vitest/globals"
     ],
+    "rootDirs": [".", "./.react-router/types"],
     "noEmit": true,
     "skipLibCheck": true
   }

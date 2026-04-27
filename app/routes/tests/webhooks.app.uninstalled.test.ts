@@ -24,7 +24,7 @@ describe('when webhook action is triggered', () => {
       topic: 'APP_UNINSTALLED',
       payload: {},
     });
-    await action(ACTION_REQUEST);
+    await action(ACTION_REQUEST as any);
     expect(enqueueSpy).toHaveBeenCalledWith(
       new DisableShopJob({
         shop: TEST_SHOP,

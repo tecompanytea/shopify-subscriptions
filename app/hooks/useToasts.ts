@@ -1,4 +1,4 @@
-import {useActionData, useLoaderData} from '@remix-run/react';
+import {useActionData, useLoaderData} from 'react-router';
 import {useAppBridge} from '@shopify/app-bridge-react';
 import {useEffect, useState} from 'react';
 

@@ -34,7 +34,7 @@ describe('when webhook action is triggered', () => {
       topic: 'SELLING_PLAN_GROUPS_UPDATE',
       payload: sellingPlanGroupsPayload,
     });
-    await action(ACTION_REQUEST);
+    await action(ACTION_REQUEST as any);
 
     expect(enqueueSpy).toHaveBeenCalledWith(
       new CreateSellingPlanTranslationsJob({
@@ -50,7 +50,7 @@ describe('when webhook action is triggered', () => {
       topic: 'SELLING_PLAN_GROUPS_CREATE',
       payload: sellingPlanGroupsPayload,
     });
-    await action(ACTION_REQUEST);
+    await action(ACTION_REQUEST as any);
 
     expect(enqueueSpy).toHaveBeenCalledWith(
       new CreateSellingPlanTranslationsJob({

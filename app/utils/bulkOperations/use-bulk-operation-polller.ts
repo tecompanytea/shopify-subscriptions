@@ -1,4 +1,4 @@
-import {useFetcher, useRevalidator} from '@remix-run/react';
+import {useFetcher, useRevalidator} from 'react-router';
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {type CurrentBulkOperation} from './bulkOperations';
 import {useAppBridge} from '@shopify/app-bridge-react';

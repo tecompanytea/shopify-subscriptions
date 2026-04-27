@@ -313,6 +313,24 @@ describe('Contract details', () => {
       expect(screen.getByText('Active')).toBeInTheDocument();
     });
 
+    it('displays the contract note when present', async () => {
+      await mountContractDetails({
+        graphQLResponses: getDefaultGraphQLResponses({
+          note: 'Leave at the back door',
+        } as any),
+      });
+
+      const notesHeading = screen.getByRole('heading', {name: 'Notes'});
+      const customerHeading = screen.getByRole('heading', {name: 'Customer'});
+
+      expect(notesHeading).toBeInTheDocument();
+      expect(
+        notesHeading.compareDocumentPosition(customerHeading) &
+          Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy();
+      expect(screen.getByText('Leave at the back door')).toBeInTheDocument();
+    });
+
     it('displays the product name, quantity, order number and price', async () => {
       await mountContractDetails();
 

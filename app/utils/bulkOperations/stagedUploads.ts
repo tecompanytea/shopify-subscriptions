@@ -1,4 +1,3 @@
-import {NodeOnDiskFile} from '@remix-run/node';
 import type {GraphQLClient} from '~/types';
 
 import type {
@@ -87,12 +86,12 @@ const uploadFile = async (
 // Uploads a file or input array to a staged upload target.
 export const uploadToStagedTarget = async <T>(
   stagedUploadTarget: StagedUploadTarget,
-  inputs: ReadonlyArray<T> | File | NodeOnDiskFile,
+  inputs: ReadonlyArray<T> | File,
 ): Promise<void> => {
   let file: File;
 
-  if (inputs instanceof File || inputs instanceof NodeOnDiskFile) {
-    file = inputs as File;
+  if (inputs instanceof File) {
+    file = inputs;
   } else {
     file = jsonlFileFromInputs(inputs as ReadonlyArray<T>);
   }

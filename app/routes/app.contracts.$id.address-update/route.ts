@@ -1,13 +1,11 @@
 import {
-  json,
-  type TypedResponse,
-  type ActionFunctionArgs,
-} from '@remix-run/node';
+  data, type ActionFunctionArgs,
+} from 'react-router';
 import {composeGid} from '@shopify/admin-graphql-api-utilities';
-import i18n from '~/i18n/i18next.server';
+import i18n from '~/i18n/i18n.server';
 import {buildDraftFromContract} from '~/models/SubscriptionContractDraft/SubscriptionContractDraft.server';
 import {authenticate} from '~/shopify.server';
-import type {WithToast} from '~/types';
+import type {TypedResponse, WithToast} from '~/types';
 import {toast} from '~/utils/toast';
 
 // This code is tested in the context of where it is used on the contract details page
@@ -24,7 +22,7 @@ export async function action({
   const address = body.get('address') as string;
   const deliveryMethodName = body.get('deliveryMethodName') as string;
 
-  const updateAddressError = json({
+  const updateAddressError = data({
     error: true,
     ...toast(t('edit.actions.updateAddress.error'), {isError: true}),
   });
@@ -53,5 +51,5 @@ export async function action({
     return updateAddressError;
   }
 
-  return json(toast(t('edit.actions.updateAddress.success')));
+  return data(toast(t('edit.actions.updateAddress.success')));
 }

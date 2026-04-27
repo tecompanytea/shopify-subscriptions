@@ -1,14 +1,10 @@
-import {
-  json,
-  type TypedResponse,
-  type ActionFunctionArgs,
-} from '@remix-run/node';
+import {data, type ActionFunctionArgs} from 'react-router';
 import {composeGid} from '@shopify/admin-graphql-api-utilities';
 import PaymentUpdateDetailsQuery from '~/graphql/PaymentUpdateDetailsQuery';
-import i18n from '~/i18n/i18next.server';
+import i18n from '~/i18n/i18n.server';
 import {sendPaymentMethodUpdateEmail} from '~/services/SendPaymentMethodUpdateEmailService';
 import {authenticate} from '~/shopify.server';
-import type {WithToast} from '~/types';
+import type {TypedResponse, WithToast} from '~/types';
 import {toast} from '~/utils/toast';
 
 // This code is tested in the context of where it is used on the contract details page
@@ -21,7 +17,7 @@ export async function action({
   const t = await i18n.getFixedT(request, 'app.contracts');
   const contractId = composeGid('SubscriptionContract', params.id || '');
 
-  const emailError = json({
+  const emailError = data({
     error: true,
     ...toast(t('paymentMethodDetails.emailModal.errorMessage'), {
       isError: true,
@@ -32,14 +28,14 @@ export async function action({
     variables: {contractId},
   });
 
-  const {data} = await response.json();
+  const {data: responseData} = await response.json();
 
-  if (!data) {
+  if (!responseData) {
     return emailError;
   }
 
-  const {name: shopName, contactEmail: shopEmail} = data?.shop;
-  const subscriptionContract = data?.subscriptionContract;
+  const {name: shopName, contactEmail: shopEmail} = responseData?.shop;
+  const subscriptionContract = responseData?.subscriptionContract;
   const customerEmail = subscriptionContract?.customer?.email;
   const customerPaymentMethodId =
     subscriptionContract?.customerPaymentMethod?.id;
@@ -68,5 +64,5 @@ export async function action({
     return emailError;
   }
 
-  return json(toast(t('paymentMethodDetails.emailModal.successMessage')));
+  return data(toast(t('paymentMethodDetails.emailModal.successMessage')));
 }

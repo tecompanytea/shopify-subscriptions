@@ -1,6 +1,6 @@
 import {BlockStack, Button, Card, Text} from '~/components/polaris';
 import {useTranslation} from 'react-i18next';
-import {useFieldArray, useFormContext} from '@rvf/remix';
+import {useFieldArray, useFormContext} from '@rvf/react-router';
 import {v4 as uuidv4} from 'uuid';
 import {
   NEW_DELIVERY_OPTION_ID,

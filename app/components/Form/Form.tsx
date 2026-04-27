@@ -1,7 +1,7 @@
 import {useCallback, useEffect} from 'react';
-import {useBlocker} from '@remix-run/react';
-import {FormProvider, useForm} from '@rvf/remix';
-import type {ValidatedFormProps} from '@rvf/remix';
+import {useBlocker} from 'react-router';
+import {FormProvider, useForm} from '@rvf/react-router';
+import type {ValidatedFormProps} from '@rvf/react-router';
 import {SaveBar, useAppBridge} from '@shopify/app-bridge-react';
 import {compareValues} from '~/utils/helpers/compareValues';
 

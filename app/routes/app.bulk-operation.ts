@@ -1,4 +1,4 @@
-import {json, type LoaderFunctionArgs} from '@remix-run/node';
+import {data, type LoaderFunctionArgs} from 'react-router';
 import {authenticate} from '~/shopify.server';
 import {getCurrentBulkOperation} from '~/utils/bulkOperations/bulkOperations';
 
@@ -10,7 +10,7 @@ export async function loader({request}: LoaderFunctionArgs) {
     'MUTATION',
   );
 
-  return json(bulkOperation);
+  return data(bulkOperation);
 }
 
 export function shouldRevalidate() {

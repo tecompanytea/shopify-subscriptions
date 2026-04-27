@@ -1,7 +1,7 @@
-import type {ActionFunctionArgs, AppLoadContext} from '@remix-run/node';
+import type {ActionFunctionArgs, AppLoadContext} from 'react-router';
 import type {Jobs} from '~/types';
 
-import {json} from '@remix-run/node';
+import {data} from 'react-router';
 import {jobs} from '~/jobs';
 
 type JobPayload = {
@@ -15,11 +15,11 @@ export async function action({request, context}: ActionFunctionArgs) {
   try {
     await jobs.execute(request);
 
-    return json({status: 'success'}, {status: 200});
+    return data({status: 'success'}, {status: 200});
   } catch (err) {
     const error = err instanceof Error ? err : new Error(String(err));
 
-    throw json({status: 'failure', error: error.message}, {status: 500});
+    throw data({status: 'failure', error: error.message}, {status: 500});
   }
 }
 

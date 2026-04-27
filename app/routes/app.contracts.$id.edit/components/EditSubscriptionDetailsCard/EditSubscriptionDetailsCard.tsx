@@ -11,11 +11,12 @@ import {
   useBreakpoints,
 } from '~/components/polaris';
 import {SearchIcon} from '~/components/polaris-icons';
-import {useFormContext} from '@rvf/remix';
+import {useFormContext} from '@rvf/react-router';
 import {useTranslation} from 'react-i18next';
 import {Select} from '~/components/Select';
 import {TextField} from '~/components/TextField';
 import type {ResourcePickerItem} from '~/types';
+import {getResourcePickerSelectionImage} from '~/utils/helpers/resourcePicker';
 import {createNewPricingPolicy} from '~/utils/helpers/subscriptionLines';
 import {DeliveryFrequencyInterval} from '~/utils/helpers/zod';
 import type {SubscriptionLine} from '../../validator';
@@ -109,22 +110,10 @@ export function EditSubscriptionDetailsCard({
 
             if (!currentLinesVariantIds.has(variant.id)) {
               const newLineVariantPrice = Number(variant.price ?? '0.00');
-              /*
-              variant image is only available for products with variants despite
-              the default variant
-              */
-              const variantImage = variant.image
-                ? {
-                    url: variant.image.originalSrc,
-                    altText: variant.image.altText ?? '',
-                  }
-                : null;
-              const fallbackImage = selectedItem.images
-                ? {
-                    url: selectedItem.images[0]?.originalSrc,
-                    altText: selectedItem.images[0]?.altText ?? '',
-                  }
-                : null;
+              const variantImage = getResourcePickerSelectionImage(
+                selectedItem,
+                variant,
+              );
 
               const newLine = {
                 title: selectedItem.title,
@@ -142,8 +131,7 @@ export function EditSubscriptionDetailsCard({
                   newLineVariantPrice,
                 ),
                 currentOneTimePurchasePrice: newLineVariantPrice,
-                variantImage:
-                  selectedItem.totalVariants > 1 ? variantImage : fallbackImage,
+                variantImage,
               };
 
               newLines.push(newLine);

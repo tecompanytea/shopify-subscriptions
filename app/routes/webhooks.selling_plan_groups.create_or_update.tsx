@@ -1,4 +1,4 @@
-import type {ActionFunctionArgs} from '@remix-run/node';
+import type {ActionFunctionArgs} from 'react-router';
 import {CreateSellingPlanTranslationsJob, jobs} from '~/jobs';
 import {authenticate} from '~/shopify.server';
 import type {Webhooks} from '~/types';

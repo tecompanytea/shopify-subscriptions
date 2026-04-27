@@ -1,4 +1,4 @@
-import type {ActionFunctionArgs} from '@remix-run/node';
+import type {ActionFunctionArgs} from 'react-router';
 import {composeGid} from '@shopify/admin-graphql-api-utilities';
 import {CustomerSendEmailJob, jobs} from '~/jobs';
 import {CustomerEmailTemplateName} from '~/services/CustomerSendEmailService';

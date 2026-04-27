@@ -53,7 +53,10 @@ async function testLoader() {
     ),
   })) as any;
 
-  return await response.json();
+  // RR7 single-fetch: loaders can return plain data or DataWithResponseInit or a Response.
+  if (response && typeof response.json === 'function') return await response.json();
+  if (response && 'data' in response) return response.data;
+  return response;
 }
 
 describe('App route', () => {
@@ -78,10 +81,9 @@ describe('App route', () => {
 });
 
 describe('/app route loader', () => {
-  it('returns the translations', async () => {
-    const data = await testLoader();
-    expect(data.polarisTranslations).toBeDefined();
-  });
+  // Origin's 1b72c00 commit removed Polaris from the embedded admin shell,
+  // so polarisTranslations is no longer part of the loader payload. Test
+  // dropped along with that field.
 
   it('returns the expected apiKey', async () => {
     const expectedApiKey = '12345';

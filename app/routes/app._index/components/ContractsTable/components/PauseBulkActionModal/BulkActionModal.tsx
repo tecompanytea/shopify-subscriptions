@@ -1,4 +1,4 @@
-import {useFetcher} from '@remix-run/react';
+import {useFetcher} from 'react-router';
 import {Modal, TitleBar, useAppBridge} from '@shopify/app-bridge-react';
 import {Box} from '~/components/polaris';
 import {useEffect, useRef} from 'react';
