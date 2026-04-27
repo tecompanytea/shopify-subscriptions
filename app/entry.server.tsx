@@ -89,7 +89,13 @@ export default async function handleRequest(
           responseHeaders.set('X-Download-Options', 'noopen');
           responseHeaders.set('X-Permitted-Cross-Domain-Policies', 'none');
           responseHeaders.set('Referrer-Policy', 'origin-when-cross-origin');
-          responseHeaders.set(
+          // CSP: addDocumentResponseHeaders above already set
+          // `frame-ancestors` for the embedded admin frame. Re-issuing
+          // CSP via .set() would overwrite that and break the embed
+          // (postMessage origin mismatch). Append the additional
+          // directives we want as a second CSP header instead — browsers
+          // apply intersection of all CSP headers.
+          responseHeaders.append(
             'Content-Security-Policy',
             "default-src 'self'; \
             script-src 'self' 'unsafe-inline' https://cdn.shopify.com; \
