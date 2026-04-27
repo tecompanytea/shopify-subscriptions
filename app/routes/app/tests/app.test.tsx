@@ -81,10 +81,9 @@ describe('App route', () => {
 });
 
 describe('/app route loader', () => {
-  it('returns the translations', async () => {
-    const data = await testLoader();
-    expect(data.polarisTranslations).toBeDefined();
-  });
+  // Origin's 1b72c00 commit removed Polaris from the embedded admin shell,
+  // so polarisTranslations is no longer part of the loader payload. Test
+  // dropped along with that field.
 
   it('returns the expected apiKey', async () => {
     const expectedApiKey = '12345';

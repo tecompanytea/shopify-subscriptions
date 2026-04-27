@@ -781,7 +781,7 @@ export function EmptySearchResult({title, description, withIllustration}: any) {
 export function ActionList({
   items,
   sections,
-  actionRole: _actionRole,
+  actionRole,
 }: {
   items?: MenuActionDescriptor[];
   sections?: Array<{items: MenuActionDescriptor[]}>;
@@ -789,15 +789,17 @@ export function ActionList({
 }) {
   const resolvedSections =
     sections ?? (items ? [{items}] : []);
+  const isMenu = actionRole === 'menuitem';
 
   return (
-    <BlockStack gap="100">
+    <BlockStack gap="100" {...(isMenu ? {role: 'menu'} : {})}>
       {resolvedSections.map((section, sectionIndex) => (
         <BlockStack key={sectionIndex} gap="100">
           {sectionIndex > 0 ? <Divider /> : null}
           {section.items.map((item, itemIndex) => (
             <Button
               key={`${sectionIndex}-${itemIndex}`}
+              role={isMenu ? 'menuitem' : undefined}
               variant="tertiary"
               tone={item.destructive ? 'critical' : undefined}
               disabled={item.disabled}
@@ -844,7 +846,14 @@ export function Popover({active, activator, onClose, children}: any) {
     <>
       {activatorNode}
       <s-popover id={id} ref={ref} onHide={onClose}>
-        {children}
+        {/*
+         * In happy-dom, the <s-popover> custom element doesn't actually
+         * hide/show its children based on overlay state, so testing-library
+         * queries see the popover content even when active is false. Drop
+         * the children when inactive in the test environment so behavior
+         * matches Polaris's runtime where hidden content isn't queryable.
+         */}
+        {IS_TEST_ENV && !active ? null : children}
       </s-popover>
     </>
   );
@@ -980,6 +989,7 @@ export function IndexFilters({
           {tabs.map((tab: TabProps, index: number) => (
             <Button
               key={tab.id}
+              id={tab.id}
               variant={index === selected ? 'primary' : 'secondary'}
               role="tab"
               aria-selected={index === selected}
@@ -1075,7 +1085,7 @@ export function IndexTable({
               ...[
                 isSelectable
                   ? React.createElement(
-                      's-table-cell' as any,
+                      'td' as any,
                       {key: '__select__', role: 'columnheader'},
                       React.createElement(Checkbox as any, {
                         label: '',
@@ -1088,7 +1098,7 @@ export function IndexTable({
                   : null,
                 ...headings.map((heading, index) =>
                   React.createElement(
-                    's-table-cell' as any,
+                    'td' as any,
                     {
                       key: index,
                       role: 'columnheader',
@@ -1121,7 +1131,7 @@ IndexTable.Row = function IndexTableRow({
 
   return (
     React.createElement(
-      's-table-row' as any,
+      'tr' as any,
       {
         id,
         role: 'row',
@@ -1131,13 +1141,14 @@ IndexTable.Row = function IndexTableRow({
       ...[
         selectable
           ? React.createElement(
-              's-table-cell' as any,
+              'td' as any,
               {
                 key: '__select__',
                 role: 'cell',
                 onClick: (event: any) => event.stopPropagation(),
               },
               React.createElement(Checkbox as any, {
+                id: `Select-${id}`,
                 label: '',
                 accessibilityLabel:
                   accessibilityLabel ??
@@ -1156,7 +1167,7 @@ IndexTable.Row = function IndexTableRow({
 
 IndexTable.Cell = function IndexTableCell({children, className, onClick}: any) {
   return React.createElement(
-    's-table-cell' as any,
+    'td' as any,
     {role: 'cell', className, onClick},
     children,
   );
@@ -1234,7 +1245,7 @@ export function TextField({
       onChange: handleChange,
     } as const;
 
-    const input = multiline ? (
+    const inputCore = multiline ? (
       <textarea
         {...inputProps}
         rows={rest.multiline === true ? 4 : rest.multiline}
@@ -1245,6 +1256,19 @@ export function TextField({
         type={type === 'search' ? 'search' : type === 'number' ? 'number' : 'text'}
       />
     );
+
+    // Polaris renders prefix/suffix adornments inline with the input. Mirror
+    // that here so testing-library can find the text via getByText('$') etc.
+    const input =
+      prefix || suffix ? (
+        <InlineStack gap="100" blockAlign="center">
+          {prefix ? <span>{prefix}</span> : null}
+          <div style={{flexGrow: 1}}>{inputCore}</div>
+          {suffix ? <span>{suffix}</span> : null}
+        </InlineStack>
+      ) : (
+        inputCore
+      );
 
     const fieldWithConnectedContent =
       connectedLeft || connectedRight ? (
@@ -1479,6 +1503,18 @@ export function RadioButton({
   const id = rest.id || `${rest.name}-${value}`;
 
   if (IS_TEST_ENV) {
+    // Only set aria-label when an explicit string accessibility label is
+    // provided (or the label is a string). When `label` is a React node
+    // such as <Address ...>, defer accessible naming to the linked
+    // <label htmlFor> element so testing-library can compute the visible
+    // text rather than serializing the element to "[object Object]".
+    const ariaLabel =
+      typeof rest.accessibilityLabel === 'string'
+        ? rest.accessibilityLabel
+        : typeof label === 'string'
+          ? label
+          : undefined;
+
     return (
       <BlockStack gap="100">
         <InlineStack gap="200" blockAlign="center">
@@ -1488,7 +1524,7 @@ export function RadioButton({
             type="radio"
             checked={Boolean(checked)}
             value={value}
-            aria-label={rest.accessibilityLabel || label}
+            aria-label={ariaLabel}
             onChange={() => onChange?.(value, rest.id)}
           />
           <label htmlFor={id}>{label}</label>

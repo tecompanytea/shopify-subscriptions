@@ -274,15 +274,16 @@ describe('Subscriptions index page', () => {
       <SellingPlansTable sellingPlanGroups={mockPlans} />,
     );
 
-    const sortBtn = document.querySelector('[data-polaris-tooltip-activator]');
+    // ~/components/polaris renders sort options as a native <select> instead
+    // of Polaris's tooltip-activated dropdown, so we look for the labeled
+    // control and verify the Created/Updated <option> labels are present.
+    const sortControl = screen.getByLabelText('Sort the results');
+    expect(sortControl).toBeInTheDocument();
 
-    expect(sortBtn).toBeInTheDocument();
-
-    if (sortBtn) {
-      await userEvent.click(sortBtn);
-
-      expect(screen.getByText('Created')).toBeInTheDocument();
-      expect(screen.getByText('Updated')).toBeInTheDocument();
-    }
+    const optionLabels = Array.from(
+      sortControl.querySelectorAll('option'),
+    ).map((option) => option.textContent);
+    expect(optionLabels.some((label) => label?.includes('Created'))).toBe(true);
+    expect(optionLabels.some((label) => label?.includes('Updated'))).toBe(true);
   });
 });

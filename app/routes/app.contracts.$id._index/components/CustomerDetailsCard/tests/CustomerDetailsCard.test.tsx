@@ -136,8 +136,12 @@ describe('CustomerDetailsCard', () => {
   it('opens the address menu when the edit button is clicked', async () => {
     mountComponentWithRemixStub(<CustomerDetailsCard {...mockProps} />);
 
-    const editButton = screen.getByRole('button');
-    await userEvent.click(editButton);
+    // Two edit buttons exist now: one for the contact email modal added in
+    // 9d9060b, and the original one for the address Popover. Click the one
+    // adjacent to the shipping address heading.
+    const buttons = screen.getAllByRole('button');
+    expect(buttons.length).toBeGreaterThanOrEqual(2);
+    await userEvent.click(buttons[buttons.length - 1]);
 
     expect(screen.getByRole('menu')).toBeInTheDocument();
     expect(screen.getByText('Select a different address')).toBeInTheDocument();
