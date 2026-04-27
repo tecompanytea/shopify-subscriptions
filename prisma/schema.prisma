@@ -6,9 +6,14 @@ generator client {
   previewFeatures = ["tracing"]
 }
 
+// Postgres in production (Neon / Vercel Postgres / similar). DATABASE_URL is
+// the pooled connection string the app uses at runtime; DATABASE_URL_UNPOOLED
+// is the direct connection that `prisma migrate deploy` needs at build time
+// (pooled connections don't allow DDL).
 datasource db {
-provider = "sqlite"
-url      = "file:./data.db"
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DATABASE_URL_UNPOOLED")
 }
 model Session {
   id       String  @id
